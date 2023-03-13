@@ -48,7 +48,7 @@ public class Downloader {
             // if the link is not in the list of links, add it
             if (!links.contains(page.attr("abs:href"))) {
                 links.add(page.attr("abs:href"));
-                // System.out.println("New link = " + page.attr("abs:href"));
+                System.out.println("New link = " + page.attr("abs:href"));
             }
         }
 
@@ -58,7 +58,7 @@ public class Downloader {
     }
 
     // Recursive method to download the webpages of the list of links
-    public void recursiveDownload(String url, int depth, int index) throws IOException {
+    public void recursiveDownload(String url, int depth) throws IOException {
         if (depth > 0) {
 
             try {
@@ -70,7 +70,7 @@ public class Downloader {
 
             // if the list of links is not empty, we download the first link
             if (!links.isEmpty()) {
-                recursiveDownload(links.get(0), depth - 1, index + 1);
+                recursiveDownload(links.get(0), depth - 1);
             }
 
         }
