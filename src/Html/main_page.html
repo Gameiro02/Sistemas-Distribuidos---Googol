@@ -2,18 +2,19 @@
 <html>
 
 <head>
-    <title>My Simple HTML Page</title>
+    <title>Search Engine</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="\src\Css\SearchEngine.css">
 </head>
 
 <body>
-    <h1>Welcome to My Page</h1>
-    <p>Here are some links:</p>
-    <ul>
-        <li><a href="https://www.google.com">Google</a></li>
-        <li><a href="https://www.yahoo.com">Yahoo</a></li>
-        <li><a href="https://www.bing.com">Bing</a></li>
-    </ul>
-    <p>Thanks for visiting!</p>
+    <h1>Search Engine</h1>
+    <form action="/search" method="get">
+        <label for="search-input">Search:</label>
+        <input type="text" id="search-input" name="q" required>
+        <button type="submit">Search</button>
+    </form>
 </body>
 
 </html>
