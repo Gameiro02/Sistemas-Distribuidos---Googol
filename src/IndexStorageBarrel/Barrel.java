@@ -40,36 +40,22 @@ public class Barrel {
             return;
         }
 
-        // Read from text file
         try {
-            // Open the file
             FileInputStream fstream = new FileInputStream(
                     "src\\IndexStorageBarrel\\BarrelFiles\\Barrel" + index + ".txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
-            // TextFile Format:
-            // Link;word1;word2;word3;word4;word5;word6;word7;word8;word9;word10(...)
-
             String strLine;
 
             while ((strLine = br.readLine()) != null) {
-                // Print the content on the console
-                // System.out.println(strLine);
-
-                // Split the line
                 String[] words = strLine.split(";");
-
-                // the first word is the key of the hash map
                 String key = words[0];
 
-                // the rest of the words are the values of the hash map
                 ArrayList<String> values = new ArrayList<String>();
-
                 for (int i = 1; i < words.length; i++) {
                     values.add(words[i]);
                 }
 
-                // Add the key and the values to the hash map
                 dicionario.put(key, values);
             }
 
@@ -88,8 +74,9 @@ public class Barrel {
         try {
             FileWriter writer = new FileWriter(directoryPath + "\\Barrel" + index + ".txt");
 
+            System.out.println("Writing to file: " + directoryPath + "\\Barrel" + index + ".txt");
+
             for (String key : dicionario.keySet()) {
-                // write the key
                 writer.write(key + ";");
 
                 for (int i = 0; i < dicionario.get(key).size(); i++) {
@@ -123,7 +110,8 @@ public class Barrel {
                 // + packet.getPort() + " with message:");
 
                 String mensagem = new String(packet.getData(), 0, packet.getLength());
-                System.out.println(mensagem);
+                // System.out.println(mensagem);
+                textParser(mensagem);
 
             }
         } catch (IOException e) {
@@ -133,9 +121,33 @@ public class Barrel {
         }
     }
 
+    private void textParser(String text) {
+        String[] words = text.split("; ");
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+
+            // Format: word | link
+            String[] wordAndLink = word.split(" | ");
+            
+            // Check if word is already in the hash map
+            if (dicionario.containsKey(wordAndLink[0])) {
+                // Check if the link is already in the list of links
+                if (!dicionario.get(wordAndLink[0]).contains(wordAndLink[2])) {
+                    dicionario.get(wordAndLink[0]).add(wordAndLink[2]);
+                }
+            } else {
+                ArrayList<String> links = new ArrayList<String>();
+                links.add(wordAndLink[2]);
+                dicionario.put(wordAndLink[0], links);
+            }
+        }
+
+    }
+
+    // Print the content of the hash map line by line "Link: word1, word2,(...)"
+    // If its the last line do not print the , at the end
     public void printHashMap() {
-        // Print the content of the hash map line by line "Link: word1, word2,(...)"
-        // If its the last line do not print the , at the end
 
         for (String key : dicionario.keySet()) {
             System.out.print(key + ": ");
@@ -150,27 +162,6 @@ public class Barrel {
 
             System.out.println();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Barrel []";
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public HashMap<String, ArrayList<String>> getDicionario() {
-        return dicionario;
-    }
-
-    public void setDicionario(HashMap<String, ArrayList<String>> dicionario) {
-        this.dicionario = dicionario;
     }
 
 }

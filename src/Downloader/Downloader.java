@@ -19,19 +19,12 @@ public class Downloader extends Thread {
     private String data;
 
     private int port = 4321;
+    private String MULTICAST_ADDRESS = "224.3.2.1";
 
     public Downloader(String url) {
         this.url = url;
         this.links = new HashSet<String>();
         this.words = new HashSet<String>();
-    }
-
-    public HashSet<String> getLinks() {
-        return links;
-    }
-
-    public HashSet<String> getWords() {
-        return words;
     }
 
     public void run() {
@@ -79,7 +72,7 @@ public class Downloader extends Thread {
     }
 
     private void sendWords() throws Exception {
-        InetAddress group = InetAddress.getByName("224.3.2.1");
+        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(port);
 
         byte[] buffer = data.getBytes();
