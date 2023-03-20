@@ -11,6 +11,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.*;
+import java.io.*;
+
 public class Downloader extends Thread {
     private String url;
     private Document doc;
@@ -20,6 +23,10 @@ public class Downloader extends Thread {
 
     private int port = 4321;
     private String MULTICAST_ADDRESS = "224.3.2.1";
+
+    /* TCP */
+    private int port_tcp = 4322;
+    String hostname_tcp = "localhost";
 
     public Downloader(String url) {
         this.url = url;
@@ -39,6 +46,13 @@ public class Downloader extends Thread {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Send words to IndexStorageBarrel via TCP
+        try {
+            sendWordsTCP();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -80,5 +94,23 @@ public class Downloader extends Thread {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, port);
         socket.send(packet);
         socket.close();
+    }
+
+    private void sendWordsTCP() throws Exception {
+        try (Socket socket = new Socket(hostname_tcp, port_tcp)) {
+
+            OutputStream output = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(output, true);
+
+            writer.println("Hello from " + socket.getLocalSocketAddress());
+
+        } catch (UnknownHostException ex) {
+
+            System.out.println("Server not found: " + ex.getMessage());
+
+        } catch (IOException ex) {
+
+            System.out.println("I/O error: " + ex.getMessage());
+        }
     }
 }
