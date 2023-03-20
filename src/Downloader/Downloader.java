@@ -13,14 +13,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import src.dados;
+import src.Dados;
 
 public class Downloader extends Thread {
     private String url;
     private Document doc;
     private HashSet<String> links;
     private HashSet<String> words;
-    private dados data;
+    private Dados data;
 
     private int port = 4321;
 
@@ -28,8 +28,7 @@ public class Downloader extends Thread {
         this.url = url;
         this.links = new HashSet<String>();
         this.words = new HashSet<String>();
-        this.data = new dados();
-        this.data.url = this.url;
+        this.data = new Dados(this.url);
     }
 
     public HashSet<String> getLinks() {
@@ -68,7 +67,7 @@ public class Downloader extends Thread {
             this.words.add(word);
         }
 
-        data.words = this.words;
+        data.setWords(this.words);
     }
 
 
