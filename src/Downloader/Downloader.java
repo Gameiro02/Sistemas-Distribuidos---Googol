@@ -22,7 +22,7 @@ public class Downloader extends Thread {
     private HashSet<String> words;
     private dados data;
 
-    private int port = 1337;
+    private int port = 4321;
 
     public Downloader(String url) {
         this.url = url;
