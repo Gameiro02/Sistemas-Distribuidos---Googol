@@ -12,23 +12,12 @@ public class UrlQueue {
         queue = new LinkedList<String>();
     }
 
-    public static void main(String[] args) {
-        int port = 4322;
+    public static void main(String[] args) throws UnknownHostException, IOException {
+        int port = 8080;
 
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        Socket socket = new Socket("localhost", port);
 
-            System.out.println("Server is listening on port " + port);
-
-            while (true) {
-                Socket socket = serverSocket.accept();
-                System.out.println("New client connected");
-
-                new ServerThreadTcp(socket).start();
-            }
-
-        } catch (IOException ex) {
-            System.out.println("Server exception: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+        ServerThreadTcp serverThreadTcp = new ServerThreadTcp(socket);
+        serverThreadTcp.start();
     }
 }

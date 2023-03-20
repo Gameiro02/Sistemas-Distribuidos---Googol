@@ -20,26 +20,16 @@ public class ServerThreadTcp extends Thread {
     }
 
     public void run() {
+        System.out.println("Connected to server");
+
         try {
-            InputStream input = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            OutputStream output = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(output, true);
+            String message = in.readLine();
+            System.out.println("Message received: " + message);
 
-            String text;
-
-            do {
-                text = reader.readLine();
-                String reverseText = new StringBuilder(text).reverse().toString();
-                writer.println("Server: " + reverseText);
-
-            } while (!text.equals("bye"));
-
-            socket.close();
-        } catch (IOException ex) {
-            System.out.println("Server exception: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

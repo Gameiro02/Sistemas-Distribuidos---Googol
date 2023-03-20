@@ -25,7 +25,7 @@ public class Downloader extends Thread {
     private String MULTICAST_ADDRESS = "224.3.2.1";
 
     /* TCP */
-    private int port_tcp = 4322;
+    private int port_tcp = 8080;
     String hostname_tcp = "localhost";
 
     public Downloader(String url) {
@@ -44,15 +44,10 @@ public class Downloader extends Thread {
 
             sendWords();
 
+            sendWordsTCP();
+
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Send words to IndexStorageBarrel via TCP
-        try {
-            sendWordsTCP();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,20 +92,18 @@ public class Downloader extends Thread {
     }
 
     private void sendWordsTCP() throws Exception {
-        try (Socket socket = new Socket(hostname_tcp, port_tcp)) {
+        ServerSocket serverSocket = new ServerSocket(port_tcp);
+        System.out.println("Server started");
+        
+        Socket clientSocket = serverSocket.accept();
+        System.out.println("Client connected");
 
-            OutputStream output = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(output, true);
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-            writer.println("Hello from " + socket.getLocalSocketAddress());
+        out.println("Hello client");
 
-        } catch (UnknownHostException ex) {
-
-            System.out.println("Server not found: " + ex.getMessage());
-
-        } catch (IOException ex) {
-
-            System.out.println("I/O error: " + ex.getMessage());
-        }
+        out.close();
+        clientSocket.close();
+        serverSocket.close();
     }
 }
