@@ -10,21 +10,41 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import src.Dados;
+
 import java.io.File;
 import java.util.HashMap;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.net.MulticastSocket;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 
 public class Barrel {
     private int index; // Numero do barrel para ter um ficehiro so para si
-    // Hash map
     private HashMap<String, ArrayList<String>> dicionario = new HashMap<String, ArrayList<String>>();
+
+    private String MULTICAST_ADDRESS = "224.3.2.1";
+    private int PORT = 4321;
 
     public Barrel(int index) {
         this.index = index;
     }
 
+    public void run() {
+        readFromtextFile();
+        // receive_multicast();
+        writeToTextFile();
+    }
+
     public void readFromtextFile() {
+
+        File f = new File("src\\IndexStorageBarrel\\BarrelFiles\\Barrel" + index + ".txt");
+        if (!f.exists()) {
+            return;
+        }
+
         // Read from text file
         try {
             // Open the file
@@ -89,6 +109,30 @@ public class Barrel {
             writer.close();
         } catch (IOException e) {
             System.out.println("Ocorreu um erro ao criar o arquivo: " + e.getMessage());
+        }
+    }
+
+    public void receive_multicast() {
+        MulticastSocket socket = null;
+        try {
+            socket = new MulticastSocket(PORT); // create socket and bind it
+            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+            socket.joinGroup(group);
+            while (true) {
+                byte[] buffer = new byte[256];
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                socket.receive(packet);
+
+                System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":"
+                        + packet.getPort() + " with message:");
+                Dados mensagem = decodeMessage(packet.getData());
+                System.out.println(mensagem);
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            socket.close();
         }
     }
 

@@ -6,13 +6,10 @@ import java.util.HashSet;
 public class Dados implements Serializable {
     private String url;
     private HashSet<String> words;
-    
-    
 
     public Dados(String url) {
         this.url = url;
     }
-
 
     @Override
     public String toString() {
@@ -23,5 +20,4 @@ public class Dados implements Serializable {
         this.words = words;
     }
 
-       
 }
