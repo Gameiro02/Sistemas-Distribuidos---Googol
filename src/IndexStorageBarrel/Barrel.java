@@ -36,6 +36,7 @@ public class Barrel {
     public void readFromtextFile() {
 
         File f = new File("src\\IndexStorageBarrel\\BarrelFiles\\Barrel" + index + ".txt");
+
         if (!f.exists()) {
             return;
         }
@@ -65,6 +66,8 @@ public class Barrel {
             System.err.println("Error: " + e.getMessage());
         }
 
+        printHashMap();
+
     }
 
     public void writeToTextFile() {
@@ -89,6 +92,8 @@ public class Barrel {
                     } else {
                         writer.write(dicionario.get(key).get(i) + ";");
                     }
+                    // Add a new line after each word
+                    writer.write(System.getProperty("line.separator"));
                 }
             }
 
