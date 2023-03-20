@@ -71,6 +71,7 @@ public class Downloader extends Thread {
         data.words = this.words;
     }
 
+
     private void sendWords() throws Exception {
         InetAddress group = InetAddress.getByName("224.3.2.1");
         MulticastSocket socket = new MulticastSocket(port);
