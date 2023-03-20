@@ -1,8 +1,6 @@
 package src.Downloader;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -12,8 +10,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import src.Dados;
 
 public class Downloader extends Thread {
     private String url;
@@ -65,6 +61,10 @@ public class Downloader extends Thread {
     private void extractWords() {
         String[] words = doc.text().split(" ");
         for (String word : words) {
+
+            if (word.contains("|") || word.contains(";") || word.contains("\n"))
+                continue;
+
             this.words.add(word);
         }
     }
@@ -72,7 +72,7 @@ public class Downloader extends Thread {
     private void convertToString() {
         String text = "";
         for (String word : words) {
-            text += word + " | " + this.url;
+            text += word + " | " + this.url + "; ";
         }
 
         this.data = text;
