@@ -496,7 +496,7 @@ Cultura;https://www.uc.pt
 são;https://www.google.com/
 tal;https://www.google.com/
 Este;https://www.uc.pt
-?român??;https://www.google.com/
+https://www.uc.pt;?român??;https://www.google.com/
 ver;https://www.google.com/
 Tecnologia;https://www.uc.pt
 Extensão;https://www.uc.pt
