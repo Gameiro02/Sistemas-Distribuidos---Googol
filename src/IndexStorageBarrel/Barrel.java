@@ -77,6 +77,10 @@ public class Barrel {
             System.out.println("Writing to file: " + directoryPath + "\\Barrel" + index + ".txt");
 
             for (String key : dicionario.keySet()) {
+                // Print the key and the values
+
+                System.out.println(key + " " + dicionario.get(key));
+
                 writer.write(key + ";");
 
                 for (int i = 0; i < dicionario.get(key).size(); i++) {
@@ -91,6 +95,7 @@ public class Barrel {
             writer.close();
         } catch (IOException e) {
             System.out.println("Ocorreu um erro ao criar o arquivo: " + e.getMessage());
+            return;
         }
     }
 
@@ -112,6 +117,7 @@ public class Barrel {
                 String mensagem = new String(packet.getData(), 0, packet.getLength());
                 // System.out.println(mensagem);
                 textParser(mensagem);
+                writeToTextFile();
 
             }
         } catch (IOException e) {
@@ -129,7 +135,7 @@ public class Barrel {
 
             // Format: word | link
             String[] wordAndLink = word.split(" | ");
-            
+
             // Check if word is already in the hash map
             if (dicionario.containsKey(wordAndLink[0])) {
                 // Check if the link is already in the list of links
