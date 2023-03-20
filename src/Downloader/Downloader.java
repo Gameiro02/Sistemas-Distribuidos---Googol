@@ -20,7 +20,7 @@ public class Downloader extends Thread {
     private Document doc;
     private HashSet<String> links;
     private HashSet<String> words;
-    private Dados data;
+    private String data;
 
     private int port = 4321;
 
@@ -28,7 +28,6 @@ public class Downloader extends Thread {
         this.url = url;
         this.links = new HashSet<String>();
         this.words = new HashSet<String>();
-        this.data = new Dados(this.url);
     }
 
     public HashSet<String> getLinks() {
@@ -44,6 +43,8 @@ public class Downloader extends Thread {
             this.doc = Jsoup.connect(url).get();
             extractLinks();
             extractWords();
+
+            convertToString();
 
             sendWords();
 
@@ -66,19 +67,22 @@ public class Downloader extends Thread {
         for (String word : words) {
             this.words.add(word);
         }
-
-        data.setWords(this.words);
     }
 
+    private void convertToString() {
+        String text = "";
+        for (String word : words) {
+            text += word + " | " + this.url;
+        }
+
+        this.data = text;
+    }
 
     private void sendWords() throws Exception {
         InetAddress group = InetAddress.getByName("224.3.2.1");
         MulticastSocket socket = new MulticastSocket(port);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(this.data);
-        byte[] buffer = baos.toByteArray();
+        byte[] buffer = data.getBytes();
 
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, port);
         socket.send(packet);

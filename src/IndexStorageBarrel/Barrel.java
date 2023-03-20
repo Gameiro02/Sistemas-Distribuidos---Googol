@@ -25,9 +25,7 @@ public class Barrel {
     }
 
     public void readFromtextFile() {
-        // Read from text file
         try {
-            // Open the file
             FileInputStream fstream = new FileInputStream(
                     "src\\IndexStorageBarrel\\BarrelFiles\\Barrel" + index + ".txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
@@ -41,10 +39,8 @@ public class Barrel {
                 // Print the content on the console
                 // System.out.println(strLine);
 
-                // Split the line
                 String[] words = strLine.split(";");
 
-                // the first word is the key of the hash map
                 String key = words[0];
 
                 // the rest of the words are the values of the hash map
