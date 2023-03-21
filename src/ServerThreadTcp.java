@@ -24,6 +24,10 @@ public class ServerThreadTcp extends Thread {
 
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+            String response = "https://www.google.com/";
+            out.println(response);
 
             String message = in.readLine();
             System.out.println("Message received: " + message);

@@ -1,6 +1,5 @@
 package src.Downloader;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -27,6 +26,8 @@ public class Downloader extends Thread {
     /* TCP */
     private int port_tcp = 8080;
     String hostname_tcp = "localhost";
+    ServerSocket serverSocket;
+    Socket clientSocket;
 
     public Downloader(String url) {
         this.url = url;
@@ -35,19 +36,28 @@ public class Downloader extends Thread {
     }
 
     public void run() {
+
         try {
-            this.doc = Jsoup.connect(url).get();
-            extractLinks();
-            extractWords();
+            serverSocket = new ServerSocket(port_tcp);
+            System.out.println("Server started");
+            clientSocket = serverSocket.accept();
+            System.out.println("Queue connected");
 
-            convertToString();
-
-            sendWords();
-
-            sendWordsTCP();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (true) {
+                try {
+                    this.url = getNextUrl();
+                } catch (Exception e) {
+                    Thread.sleep(1000);
+                    continue;
+                }
+                System.out.println("URL: " + this.url);
+                this.doc = Jsoup.connect(this.url).get();
+                extractLinks();
+                extractWords();
+                convertToString();
+                sendWords();
+                sendLink();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,19 +101,18 @@ public class Downloader extends Thread {
         socket.close();
     }
 
-    private void sendWordsTCP() throws Exception {
-        ServerSocket serverSocket = new ServerSocket(port_tcp);
-        System.out.println("Server started");
-        
-        Socket clientSocket = serverSocket.accept();
-        System.out.println("Client connected");
-
+    private void sendLink() throws Exception {
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-        out.println("Hello client");
-
+        out.println("URL todo bonito");
         out.close();
-        clientSocket.close();
-        serverSocket.close();
+    }
+
+    private String getNextUrl() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        String url = in.readLine();
+        System.out.println("Message received: " + url);
+        return url;
     }
 }
