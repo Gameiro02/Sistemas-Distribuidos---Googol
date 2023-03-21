@@ -10,13 +10,13 @@ import src.IndexStorageBarrel.Barrel;
 
 public class programa {
     public static void main(String[] args) throws IOException {
-        Downloader d = new Downloader("https://www.google.com/");
+        Downloader d = new Downloader("https://www.google.com");
         // Downloader d2 = new Downloader("https://www.uc.pt");
 
         d.start();
         // d2.start();
 
-        // Barrel b = new Barrel(1);
-        // b.run();
+        Barrel b = new Barrel(1);
+        b.run();
     }
 }
