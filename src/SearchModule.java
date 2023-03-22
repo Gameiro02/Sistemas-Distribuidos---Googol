@@ -1,4 +1,4 @@
-package src.SearchModule;
+package src;
 
 import java.io.*;
 import java.net.*;

@@ -1,4 +1,4 @@
-package src.Downloader;
+package src;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -26,7 +26,8 @@ public class Downloader extends Thread {
     private String MULTICAST_ADDRESS = "224.3.2.1";
 
     /* TCP */
-    private int port_tcp = 8080;
+    private static int PORT_A = 8080;
+    private static int PORT_B = 8081;
     String hostname_tcp = "localhost";
     ServerSocket serverSocket;
     Socket clientSocket;
@@ -41,20 +42,22 @@ public class Downloader extends Thread {
 
         while (true) {
             try {
-                this.url = getNextUrl();
+                this.url = getUrl();
                 if (this.url == null) {
                     System.out.println("No more urls to download");
                     continue;
                 }
 
                 this.doc = Jsoup.connect(this.url).get();
-                extractLinks();
-                extractWords();
+                download();
                 convertToString();
                 sendWords();
                 // sendLink();
 
                 System.out.println("Downloader[" + this.ID + "] " + "downloaded: " + this.url);
+                sendLinkToQueue();
+
+                clear();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -63,14 +66,7 @@ public class Downloader extends Thread {
         }
     }
 
-    private void extractLinks() {
-        Elements links = doc.select("a[href]");
-        for (Element link : links) {
-            this.links.add(link.attr("abs:href"));
-        }
-    }
-
-    private void extractWords() {
+    private void download() {
         String[] words = doc.text().split(" ");
         for (String word : words) {
 
@@ -78,6 +74,11 @@ public class Downloader extends Thread {
                 continue;
 
             this.words.add(word);
+        }
+
+        Elements links = doc.select("a[href]");
+        for (Element link : links) {
+            this.links.add(link.attr("abs:href"));
         }
     }
 
@@ -94,6 +95,8 @@ public class Downloader extends Thread {
         InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(port);
 
+        // Cut the data if it's too long
+        data = data.substring(0, Math.min(data.length(), 64000));
         byte[] buffer = data.getBytes();
 
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, port);
@@ -101,15 +104,31 @@ public class Downloader extends Thread {
         socket.close();
     }
 
-    private String getNextUrl() throws IOException {
-        Socket socket = new Socket(hostname_tcp, port_tcp);
-
+    private String getUrl() throws IOException {
+        Socket socket = new Socket(hostname_tcp, PORT_A);
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String url = in.readLine();
-
-        System.out.println("Downloader[" + this.ID + "] " + "received url: " + url);
         socket.close();
 
+        System.out.println("Downloader[" + this.ID + "] " + "received url: " + url);
         return url;
+    }
+
+    private void sendLinkToQueue() throws IOException{
+        Socket socket = new Socket(hostname_tcp, PORT_B);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        for (String link : links) {
+            out.println(link);
+            System.out.println("Downloader[" + this.ID + "] " + "sent url: " + link);
+        }
+
+        socket.close();
+    }
+
+    private void clear() {
+        this.links.clear();
+        this.words.clear();
+        this.data = "";
     }
 }

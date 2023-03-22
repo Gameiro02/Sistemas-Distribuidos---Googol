@@ -1,4 +1,4 @@
-package src.IndexStorageBarrel;
+package src;
 
 // Java class to store the index in barrels
 // The class need to import from a file the current links of the barrel
@@ -35,7 +35,7 @@ public class Barrel {
 
     public void readFromtextFile() {
 
-        File f = new File("src\\IndexStorageBarrel\\BarrelFiles\\Barrel" + index + ".txt");
+        File f = new File("src\\BarrelFiles\\Barrel" + index + ".txt");
 
         if (!f.exists()) {
             return;
@@ -43,7 +43,7 @@ public class Barrel {
 
         try {
             FileInputStream fstream = new FileInputStream(
-                    "src\\IndexStorageBarrel\\BarrelFiles\\Barrel" + index + ".txt");
+                    "src\\BarrelFiles\\Barrel" + index + ".txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
             String strLine;
@@ -66,13 +66,13 @@ public class Barrel {
             System.err.println("Error: " + e.getMessage());
         }
 
-        printHashMap();
+        // printHashMap();
 
     }
 
     public void writeToTextFile() {
 
-        String directoryPath = "src\\IndexStorageBarrel\\BarrelFiles";
+        String directoryPath = "src\\BarrelFiles";
 
         try {
             FileWriter writer = new FileWriter(directoryPath + "\\Barrel" + index + ".txt");

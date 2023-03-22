@@ -1,10 +1,6 @@
 package src;
 
 import java.io.IOException;
-import java.util.HashSet;
-
-import src.Downloader.Downloader;
-import src.IndexStorageBarrel.Barrel;
 
 // Install vscode extension: liveserver
 
@@ -16,7 +12,7 @@ public class programa {
         d.start();
         d2.start();
 
-        // Barrel b = new Barrel(1);
-        // b.run();
+        Barrel b = new Barrel(1);
+        b.run();
     }
 }
