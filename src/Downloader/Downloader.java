@@ -20,6 +20,8 @@ public class Downloader extends Thread {
     private HashSet<String> words;
     private String data;
 
+    private int ID;
+
     private int port = 4321;
     private String MULTICAST_ADDRESS = "224.3.2.1";
 
@@ -29,43 +31,35 @@ public class Downloader extends Thread {
     ServerSocket serverSocket;
     Socket clientSocket;
 
-    public Downloader(String url) {
-        this.url = url;
+    public Downloader(int ID) {
+        this.ID = ID;
         this.links = new HashSet<String>();
         this.words = new HashSet<String>();
     }
 
     public void run() {
 
-        try {
-            serverSocket = new ServerSocket(port_tcp);
-            System.out.println("Server started");
-            clientSocket = serverSocket.accept();
-            System.out.println("Queue connected");
-
-            while (true) {
-                try {
-                    this.url = getNextUrl();
-                    if (this.url == null) {
-                        Thread.sleep(1000);
-                        continue;
-                    }
-                    System.out.println("URL: " + this.url);
-
-                    this.doc = Jsoup.connect(this.url).get();
-                    extractLinks();
-                    extractWords();
-                    convertToString();
-                    sendWords();
-                    // sendLink();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Thread.sleep(1000);
+        while (true) {
+            try {
+                this.url = getNextUrl();
+                if (this.url == null) {
+                    System.out.println("No more urls to download");
                     continue;
                 }
+
+                this.doc = Jsoup.connect(this.url).get();
+                extractLinks();
+                extractWords();
+                convertToString();
+                sendWords();
+                // sendLink();
+
+                System.out.println("Downloader[" + this.ID + "] " + "downloaded: " + this.url);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -107,17 +101,15 @@ public class Downloader extends Thread {
         socket.close();
     }
 
-    private void sendLink() throws Exception {
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-        out.println("URL todo bonito");
-        out.close();
-    }
-
     private String getNextUrl() throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        Socket socket = new Socket(hostname_tcp, port_tcp);
 
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String url = in.readLine();
+
+        System.out.println("Downloader[" + this.ID + "] " + "received url: " + url);
+        socket.close();
+
         return url;
     }
 }

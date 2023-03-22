@@ -13,15 +13,12 @@ public class UrlQueue {
 
         queue.add("https://www.google.com");
         queue.add("https://www.uc.pt");
+        queue.add("https://www.facebook.com");
     }
 
     public static void main(String[] args) throws UnknownHostException, IOException {
-        int port = 8080;
-
-        Socket socket = new Socket("localhost", port);
-
-        ServerThreadTcp serverThreadTcp = new ServerThreadTcp(socket);
-        serverThreadTcp.start();
+        QueueThread queueThread = new QueueThread();
+        queueThread.start();
     }
 
     public Queue<String> getQueue() {
