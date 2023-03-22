@@ -82,7 +82,7 @@ public class Barrel {
             for (String key : dicionario.keySet()) {
                 // Print the key and the values
 
-                System.out.println(key + " " + dicionario.get(key));
+                // System.out.println(key + " " + dicionario.get(key));
 
                 writer.write(key + ";");
 
@@ -92,9 +92,8 @@ public class Barrel {
                     } else {
                         writer.write(dicionario.get(key).get(i) + ";");
                     }
-                    // Add a new line after each word
-                    writer.write(System.getProperty("line.separator"));
                 }
+                writer.write(System.getProperty("line.separator"));
             }
 
             writer.close();

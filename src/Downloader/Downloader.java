@@ -46,17 +46,23 @@ public class Downloader extends Thread {
             while (true) {
                 try {
                     this.url = getNextUrl();
+                    if (this.url == null) {
+                        Thread.sleep(1000);
+                        continue;
+                    }
+                    System.out.println("URL: " + this.url);
+
+                    this.doc = Jsoup.connect(this.url).get();
+                    extractLinks();
+                    extractWords();
+                    convertToString();
+                    sendWords();
+                    // sendLink();
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Thread.sleep(1000);
                     continue;
                 }
-                System.out.println("URL: " + this.url);
-                this.doc = Jsoup.connect(this.url).get();
-                extractLinks();
-                extractWords();
-                convertToString();
-                sendWords();
-                sendLink();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,7 +118,6 @@ public class Downloader extends Thread {
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
         String url = in.readLine();
-        System.out.println("Message received: " + url);
         return url;
     }
 }

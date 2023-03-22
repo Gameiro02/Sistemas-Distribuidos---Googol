@@ -10,6 +10,9 @@ public class UrlQueue {
 
     public UrlQueue() {
         queue = new LinkedList<String>();
+
+        queue.add("https://www.google.com");
+        queue.add("https://www.uc.pt");
     }
 
     public static void main(String[] args) throws UnknownHostException, IOException {
@@ -19,5 +22,9 @@ public class UrlQueue {
 
         ServerThreadTcp serverThreadTcp = new ServerThreadTcp(socket);
         serverThreadTcp.start();
+    }
+
+    public Queue<String> getQueue() {
+        return queue;
     }
 }
