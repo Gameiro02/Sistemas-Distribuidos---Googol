@@ -8,8 +8,6 @@ public class UrlQueue {
 
     private Queue<String> queue;
     private ArrayList <String> visited;
-    private static int SEND_PORT = 8080;
-    private static int RECEIVE_PORT = 8081;
 
     public UrlQueue() {
         queue = new LinkedList<String>();
@@ -21,7 +19,7 @@ public class UrlQueue {
     public void addUrl(String url) {
         if (visited.contains(url))
             return;
-            
+
         queue.add(url);
         visited.add(url);
     }
@@ -36,8 +34,8 @@ public class UrlQueue {
 
         UrlQueue urlQueue = new UrlQueue();
 
-        QueueThread queueSend = new QueueThread(urlQueue, SEND_PORT);
-        QueueThread queueReceive = new QueueThread(urlQueue, RECEIVE_PORT);
+        QueueThread queueSend = new QueueThread(urlQueue, Configuration.PORT_A);
+        QueueThread queueReceive = new QueueThread(urlQueue, Configuration.PORT_B);
         queueSend.start();
         queueReceive.start();
     }

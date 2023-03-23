@@ -20,9 +20,6 @@ public class Barrel {
     private int index; // Numero do barrel para ter um ficehiro so para si
     private HashMap<String, ArrayList<String>> dicionario = new HashMap<String, ArrayList<String>>();
 
-    private String MULTICAST_ADDRESS = "224.3.2.1";
-    private int PORT = 4321;
-
     public Barrel(int index) {
         this.index = index;
     }
@@ -106,8 +103,8 @@ public class Barrel {
     public void receive_multicast() {
         MulticastSocket socket = null;
         try {
-            socket = new MulticastSocket(PORT); // create socket and bind it
-            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+            socket = new MulticastSocket(Configuration.MULTICAST_PORT);
+            InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
             socket.joinGroup(group);
             while (true) {
                 byte[] buffer = new byte[16384];

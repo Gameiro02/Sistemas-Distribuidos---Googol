@@ -7,13 +7,11 @@ import java.net.*;
 
 public class QueueThread extends Thread {
     private ServerSocket serverSocket;
-    private static int PORT_A = 8080;
-    private static int PORT_B = 8081;
     private int port;
     private UrlQueue urlQueue;
 
     public QueueThread(UrlQueue urlQueue, int port) throws IOException {
-        if (port != PORT_A && port != PORT_B)
+        if (port != Configuration.PORT_A && port != Configuration.PORT_B)
             throw new IllegalArgumentException("Invalid port number");
 
         this.port = port;
@@ -55,9 +53,9 @@ public class QueueThread extends Thread {
     public void run() {
         while (true) {
             try {
-                if (port == PORT_A) {
+                if (port == Configuration.PORT_A) {
                     sendUrl();
-                } else if (port == PORT_B)
+                } else if (port == Configuration.PORT_B)
                     receiveUrl();
             } catch (Exception e) {
                 e.printStackTrace();

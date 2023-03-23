@@ -2,17 +2,17 @@ package src;
 
 import java.io.IOException;
 
-// Install vscode extension: liveserver
-
 public class programa {
     public static void main(String[] args) throws IOException {
-        Downloader d = new Downloader(1);
-        Downloader d2 = new Downloader(2);
 
-        d.start();
-        d2.start();
+        for (int i = 1; i <= Configuration.NUM_DOWNLOADERS; i++) {
+            Downloader d = new Downloader(i);
+            d.start();
+        }
 
-        Barrel b = new Barrel(1);
-        b.run();
+        for (int i = 1; i <= Configuration.NUM_BARRELS; i++) {
+            Barrel b = new Barrel(i);
+            b.run();
+        }
     }
 }

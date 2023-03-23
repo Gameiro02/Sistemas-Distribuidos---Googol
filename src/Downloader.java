@@ -22,16 +22,6 @@ public class Downloader extends Thread {
 
     private int ID;
 
-    private int port = 4321;
-    private String MULTICAST_ADDRESS = "224.3.2.1";
-
-    /* TCP */
-    private static int PORT_A = 8080;
-    private static int PORT_B = 8081;
-    String hostname_tcp = "localhost";
-    ServerSocket serverSocket;
-    Socket clientSocket;
-
     public Downloader(int ID) {
         this.ID = ID;
         this.links = new HashSet<String>();
@@ -92,20 +82,18 @@ public class Downloader extends Thread {
     }
 
     private void sendWords() throws Exception {
-        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-        MulticastSocket socket = new MulticastSocket(port);
+        InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
+        MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
-        // Cut the data if it's too long
-        data = data.substring(0, Math.min(data.length(), 64000));
         byte[] buffer = data.getBytes();
 
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, port);
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT);
         socket.send(packet);
         socket.close();
     }
 
     private String getUrl() throws IOException {
-        Socket socket = new Socket(hostname_tcp, PORT_A);
+        Socket socket = new Socket("localhost", Configuration.PORT_A);
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String url = in.readLine();
         socket.close();
@@ -115,7 +103,7 @@ public class Downloader extends Thread {
     }
 
     private void sendLinkToQueue() throws IOException{
-        Socket socket = new Socket(hostname_tcp, PORT_B);
+        Socket socket = new Socket("localhost", Configuration.PORT_B);
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
         for (String link : links) {
