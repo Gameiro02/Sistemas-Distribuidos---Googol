@@ -21,16 +21,11 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 	}    
 
     @Override
-    public String searchForWord(String word) throws NotBoundException, FileNotFoundException, IOException {
+    public String searchForWords(String word) throws NotBoundException, FileNotFoundException, IOException {
         int randomBarrel = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
         BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel"+randomBarrel);
-        String result = barrel.searchForWord(word);
+        String result = barrel.searchForWords(word);
         return result;
-    }
-
-    @Override
-    public void getWordFromBarrels(String word) throws RemoteException {
-        
     }
 
     public static void main(String[] args) throws IOException, NotBoundException {
@@ -38,8 +33,6 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         LocateRegistry.createRegistry(1099);
         Naming.rebind("SearchModule", searchModule);
         
-        System.out.println("SearchModule is ready.");
-
         for (int i = 1; i <= Configuration.NUM_DOWNLOADERS; i++) {
             Downloader d = new Downloader(i);
             d.start();

@@ -8,6 +8,6 @@ import java.rmi.NotBoundException;
 public class Client {
     public static void main(String[] args) throws NotBoundException, FileNotFoundException, IOException {
         SearchModuleInterface searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
-        System.out.println(searchModule.searchForWord("Hey"));
+        System.out.println(searchModule.searchForWords("Test Ola Hey Document"));
     }
 }

@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.io.File;
 
@@ -130,7 +132,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         writer.close();
     }
 
-    @Override
+    // Searches for a single word in the barrel
     public String searchForWord(String word) throws IOException {
         // Read file
         List<String> lines = new ArrayList<>();
@@ -151,6 +153,40 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         }
         return "Word not found";
+    }
+
+    // Searches for multiple words in the barrel
+    @Override
+    public String searchForWords(String words) throws IOException {
+        String[] wordsArray = words.split(" ");
+        HashMap<String, Integer> links = new HashMap<String, Integer>();
+        for (String word : wordsArray) {
+            String linksForWord = searchForWord(word);
+            if (!linksForWord.equals("Word not found")) {
+                String[] linksArray = linksForWord.split(";");
+                for (String link : linksArray) {
+                    if (links.containsKey(link)) {
+                        links.put(link, links.get(link) + 1);
+                    } else {
+                        links.put(link, 1);
+                    }
+                }
+            }
+        }
+
+        // Return only the links that appear in all words
+        HashSet<String> linksSet = new HashSet<String>(Arrays.asList(links.keySet().toArray(new String[0])));
+        for (String link : links.keySet()) {
+            if (links.get(link) != wordsArray.length) {
+                linksSet.remove(link);
+            }
+        }
+
+        if (linksSet.size() == 0) {
+            return "No links found";
+        }
+
+        return String.join("\n", linksSet);
     }
 
 }

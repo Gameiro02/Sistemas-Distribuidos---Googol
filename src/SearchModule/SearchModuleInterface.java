@@ -8,6 +8,5 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface SearchModuleInterface extends Remote {
-    public String searchForWord(String word) throws RemoteException, MalformedURLException, NotBoundException, FileNotFoundException, IOException;
-    public void getWordFromBarrels(String word) throws RemoteException;
+    public String searchForWords(String words) throws RemoteException, MalformedURLException, NotBoundException, FileNotFoundException, IOException;
 }

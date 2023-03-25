@@ -5,5 +5,5 @@ import java.io.IOException;
 import java.rmi.Remote;
 
 public interface BarrelInterface extends Remote {
-    public String searchForWord(String word) throws FileNotFoundException, IOException;
+    public String searchForWords(String word) throws FileNotFoundException, IOException;
 }
