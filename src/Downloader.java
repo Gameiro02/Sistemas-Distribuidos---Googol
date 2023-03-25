@@ -38,6 +38,7 @@ public class Downloader extends Thread {
                     continue;
                 }
 
+                System.out.println("Downloader[" + this.ID + "] " + "downloading: " + this.url);
                 this.doc = Jsoup.connect(this.url).get();
                 download();
                 convertToString();
@@ -101,14 +102,14 @@ public class Downloader extends Thread {
         return url;
     }
 
-    private void sendLinkToQueue() throws IOException{
+    private void sendLinkToQueue() throws IOException {
         Socket socket = new Socket("localhost", Configuration.PORT_B);
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
         for (String link : links) {
             out.println(link);
             System.out.println("Downloader[" + this.ID + "] " + "sent url: " + link);
-        }        
+        }
 
         socket.close();
     }
