@@ -28,6 +28,14 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         return result;
     }
 
+    @Override
+    public List<String> linksToAPage(String word) throws FileNotFoundException, IOException, NotBoundException {
+        int randomBarrel = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
+        BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel"+randomBarrel);
+        List<String> result = barrel.linksToAPage(word);
+        return result;
+    }
+
     public static void main(String[] args) throws IOException, NotBoundException {
         SearchModule searchModule = new SearchModule();
         LocateRegistry.createRegistry(1099);

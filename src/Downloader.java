@@ -42,13 +42,9 @@ public class Downloader extends Thread {
                 this.doc = Jsoup.connect(this.url).get();
                 download();
                 sendWords();
-                // sendLink();
 
                 System.out.println("Downloader[" + this.ID + "] " + "downloaded: " + this.url);
                 sendLinkToQueue();
-
-                clear();
-
             } catch (Exception e) {
                 e.printStackTrace();
                 continue;
@@ -75,7 +71,11 @@ public class Downloader extends Thread {
     }
 
     private void sendWords() throws Exception {
-        this.data = this.url + ";" + this.title + ";" + this.words;
+        String referencedUrls = "";
+        for (String link : this.links) {
+            referencedUrls += link + "|";
+        }
+        this.data = this.url + "|" + referencedUrls + ";" + this.title + ";" + this.words;
 
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
@@ -106,11 +106,5 @@ public class Downloader extends Thread {
         }        
 
         socket.close();
-    }
-
-    private void clear() {
-        this.links.clear();
-        this.words = "";
-        this.data = "";
     }
 }

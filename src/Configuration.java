@@ -4,6 +4,8 @@ public class Configuration {
     public static final String login = "tintin";
     public static final String password = "unicorn";
 
+    public boolean DEBUG = true;
+
     // TCP ports
     public static int PORT_A = 8080;
     public static int PORT_B = 8081;
