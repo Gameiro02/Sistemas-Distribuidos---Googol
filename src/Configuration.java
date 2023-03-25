@@ -13,4 +13,8 @@ public class Configuration {
 
     public static int NUM_DOWNLOADERS = 2;
     public static int NUM_BARRELS = 3;
+
+    // Multicast para a pagina de administração
+    public static String MULTICAST_ADDRESS_ADMIN = "224.3.2.2";
+    public static int MULTICAST_PORT_ADMIN = 4333;
 }

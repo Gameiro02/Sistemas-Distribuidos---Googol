@@ -13,6 +13,7 @@ import src.Configuration;
 import src.Downloader;
 import src.Barrels.Barrel;
 import src.Barrels.BarrelInterface;
+import src.AdminPage;
 
 public class SearchModule extends UnicastRemoteObject implements SearchModuleInterface {
 
@@ -36,14 +37,16 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         for (int i = 1; i <= Configuration.NUM_BARRELS; i++) {
             Barrel b = new Barrel(i);
             b.start();
-            System.out.println("Barrel " + i + " is ready.");
+            // System.out.println("Barrel " + i + " is ready.");
         }
 
         for (int i = 1; i <= Configuration.NUM_DOWNLOADERS; i++) {
             Downloader d = new Downloader(i);
             d.start();
-            System.out.println("Downloader " + i + " is ready.");
+            // System.out.println("Downloader " + i + " is ready.");
         }
 
+        AdminPage adminPage = new AdminPage();
+        adminPage.showMenu();
     }
 }

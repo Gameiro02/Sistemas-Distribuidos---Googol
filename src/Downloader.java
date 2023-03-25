@@ -29,14 +29,21 @@ public class Downloader extends Thread {
     }
 
     public void run() {
-
+        try {
+            sendStatus("Waiting");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         while (true) {
             try {
                 this.url = getUrl();
                 if (this.url == null) {
+                    sendStatus("Waiting");
                     System.out.println("No more urls to download");
                     continue;
                 }
+
+                sendStatus("Active");
 
                 System.out.println("Downloader[" + this.ID + "] " + "downloading: " + this.url);
                 this.doc = Jsoup.connect(this.url).get();
@@ -111,6 +118,32 @@ public class Downloader extends Thread {
             System.out.println("Downloader[" + this.ID + "] " + "sent url: " + link);
         }
 
+        socket.close();
+    }
+
+    private void sendStatus(String status) throws IOException {
+        InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
+        MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
+
+        // if its active send the url and the ip and port
+        // if its waiting send the ip and port
+
+        String statusString = "DOWNLOADER;" + this.ID + ";";
+
+        if (status == "Active") {
+            statusString += "Active;" + this.url + ";" + Configuration.PORT_A;
+        } else if (status == "Waiting") {
+            statusString += "Waiting;" + Configuration.PORT_A;
+        } else {
+            System.out.println("Invalid status");
+            socket.close();
+            return;
+        }
+
+        byte[] buffer = statusString.getBytes();
+
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT_ADMIN);
+        socket.send(packet);
         socket.close();
     }
 

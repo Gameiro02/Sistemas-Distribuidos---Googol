@@ -70,8 +70,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 ArrayList<String> data;
                 data = textParser(mensagem);
                 writeToFile(data);
-
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
