@@ -13,7 +13,6 @@ import src.Configuration;
 import src.Downloader;
 import src.Barrels.Barrel;
 import src.Barrels.BarrelInterface;
-import src.Barrels.Barrel;
 
 public class SearchModule extends UnicastRemoteObject implements SearchModuleInterface{
 
