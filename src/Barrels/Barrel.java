@@ -1,0 +1,156 @@
+package src.Barrels;
+
+// Java class to store the index in barrels
+// The class need to import from a file the current links of the barrel
+// The page also need to store in a file the current links of the barrel
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.io.File;
+
+import src.Configuration;
+
+import java.io.FileWriter;
+import java.net.MulticastSocket;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+
+public class Barrel extends Thread implements BarrelInterface, Serializable {
+    private int index; // Numero do barrel para ter um ficehiro so para si
+    private String FILENAME;
+
+    public Barrel(int index) throws IOException, RemoteException {
+        this.index = index;
+        this.FILENAME = "src\\Barrels\\BarrelFiles\\Barrel" + this.index + ".txt";
+
+        File f = new File(FILENAME);
+
+        if (f.exists()) {
+            FileWriter writer = new FileWriter(FILENAME);
+            writer.write("");
+            writer.close();
+        } else {
+            f.createNewFile();
+        }
+
+        try {
+            Naming.rebind("rmi://localhost/Barrel" + index, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void run() {
+        receive_multicast();
+    }
+
+    public void receive_multicast() {
+        MulticastSocket socket = null;
+        try {
+            socket = new MulticastSocket(Configuration.MULTICAST_PORT);
+            InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
+            socket.joinGroup(group);
+            while (true) {
+                byte[] buffer = new byte[16384];
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                socket.receive(packet);
+
+                String mensagem = new String(packet.getData(), 0, packet.getLength());
+                ArrayList<String> data;
+                data = textParser(mensagem);
+                writeToFile(data);
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            socket.close();
+        }
+    }
+
+    private ArrayList<String> textParser(String text) throws IOException {
+        String[] words = text.split("; ");
+        ArrayList<String> data = new ArrayList<String>();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+
+            // Format: word | link
+            String[] wordAndLink = word.split(" | ");
+            data.add(wordAndLink[0] + " | " + wordAndLink[2]);
+        }
+        return data;
+    }
+
+    private void writeToFile(ArrayList<String> data) throws IOException {
+        List<String> lines = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new FileReader(FILENAME));
+        String line;
+        while ((line = br.readLine()) != null) {
+            lines.add(line);
+        }
+        br.close();
+
+        for (String wordAndLink : data) {
+            String wordToAdd = wordAndLink.split(" | ")[0];
+            String linkToAdd = wordAndLink.split(" | ")[2];
+
+            boolean found = false;
+            for (String linha : lines) {
+                String[] parts = linha.split(";");
+                String word = parts[0];
+                List<String> links = Arrays.asList(parts).subList(1, parts.length);
+                if (word.equals(wordToAdd)) {
+                    if (!links.contains(linkToAdd)) {
+                        lines.set(lines.indexOf(linha), linha + ";" + linkToAdd);
+                    }
+                    found = true;
+                }
+            }
+            if (!found) {
+                lines.add(wordToAdd + ";" + linkToAdd);
+            }
+        }
+
+        // Write to file
+        FileWriter writer = new FileWriter(FILENAME);
+        for (String linha : lines) {
+            writer.write(linha);
+            writer.write(System.getProperty("line.separator"));
+        }
+        writer.close();
+    }
+
+    @Override
+    public String searchForWord(String word) throws IOException {
+        // Read file
+        List<String> lines = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new FileReader(FILENAME));
+        String line;
+        while ((line = br.readLine()) != null) {
+            lines.add(line);
+        }
+        br.close();
+
+        // Search for word
+        for (String linha : lines) {
+            String[] parts = linha.split(";");
+            String wordInFile = parts[0];
+            if (wordInFile.equals(word)) {
+                List<String> links = Arrays.asList(parts).subList(1, parts.length);
+                return String.join(";", links);
+            }
+        }
+        return "Word not found";
+    }
+
+}

@@ -98,7 +98,6 @@ public class Downloader extends Thread {
         String url = in.readLine();
         socket.close();
 
-        System.out.println("Downloader[" + this.ID + "] " + "received url: " + url);
         return url;
     }
 
@@ -109,7 +108,7 @@ public class Downloader extends Thread {
         for (String link : links) {
             out.println(link);
             System.out.println("Downloader[" + this.ID + "] " + "sent url: " + link);
-        }
+        }        
 
         socket.close();
     }

@@ -39,8 +39,8 @@ public class QueueThread extends Thread {
         Socket socket = serverSocket.accept();
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        while (in.ready()) {
-            String url = in.readLine();
+        String url;
+        while ((url = in.readLine()) != null) {
             synchronized (urlQueue) {
                 urlQueue.addUrl(url);
             }
@@ -55,8 +55,9 @@ public class QueueThread extends Thread {
             try {
                 if (port == Configuration.PORT_A) {
                     sendUrl();
-                } else if (port == Configuration.PORT_B)
+                } else if (port == Configuration.PORT_B) {
                     receiveUrl();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

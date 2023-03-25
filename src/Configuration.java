@@ -12,5 +12,5 @@ public class Configuration {
     public static String MULTICAST_ADDRESS = "224.3.2.1";
 
     public static int NUM_DOWNLOADERS = 2;
-    public static int NUM_BARRELS = 1;
+    public static int NUM_BARRELS = 3;
 }
