@@ -1,1 +1,2 @@
-- Às vezes, a queue não recebe os URLs que o downloader envia, quando os barris estão a ser utilizados.
+Arquitetura dos storage barrels:
+- link;titulo_da_pagina;palavras;

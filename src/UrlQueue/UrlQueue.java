@@ -1,8 +1,10 @@
-package src;
+package src.UrlQueue;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
+import src.Configuration;
 
 public class UrlQueue {
 

@@ -17,7 +17,8 @@ public class Downloader extends Thread {
     private String url;
     private Document doc;
     private HashSet<String> links;
-    private HashSet<String> words;
+    private String words;
+    private String title;
     private String data;
 
     private int ID;
@@ -25,7 +26,7 @@ public class Downloader extends Thread {
     public Downloader(int ID) {
         this.ID = ID;
         this.links = new HashSet<String>();
-        this.words = new HashSet<String>();
+        this.words = "";
     }
 
     public void run() {
@@ -40,7 +41,6 @@ public class Downloader extends Thread {
 
                 this.doc = Jsoup.connect(this.url).get();
                 download();
-                convertToString();
                 sendWords();
                 // sendLink();
 
@@ -57,13 +57,15 @@ public class Downloader extends Thread {
     }
 
     private void download() {
+        String title = doc.title();
+        this.title = title;
+
         String[] words = doc.text().split(" ");
         for (String word : words) {
-
             if (word.contains("|") || word.contains(";") || word.contains("\n"))
                 continue;
 
-            this.words.add(word);
+            this.words += word + ";";
         }
 
         Elements links = doc.select("a[href]");
@@ -72,20 +74,13 @@ public class Downloader extends Thread {
         }
     }
 
-    private void convertToString() {
-        String text = "";
-        for (String word : words) {
-            text += word + " | " + this.url + "; ";
-        }
-
-        this.data = text;
-    }
-
     private void sendWords() throws Exception {
+        this.data = this.url + ";" + this.title + ";" + this.words;
+
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
-        byte[] buffer = data.getBytes();
+        byte[] buffer = this.data.getBytes();
 
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT);
         socket.send(packet);
@@ -115,7 +110,7 @@ public class Downloader extends Thread {
 
     private void clear() {
         this.links.clear();
-        this.words.clear();
+        this.words = "";
         this.data = "";
     }
 }

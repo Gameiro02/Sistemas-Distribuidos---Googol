@@ -13,4 +13,6 @@ public class Configuration {
 
     public static int NUM_DOWNLOADERS = 2;
     public static int NUM_BARRELS = 3;
+
+    public static int CONTEXT_SIZE = 5;
 }
