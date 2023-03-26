@@ -52,13 +52,10 @@ public class Downloader extends Thread {
 
                 System.out.println("Downloader[" + this.ID + "] " + "downloaded: " + this.url);
                 sendLinkToQueue();
-<<<<<<< HEAD
 
                 clear();
                 sendStatus("Waiting");
 
-=======
->>>>>>> fa9aeffdbed5e7fa2df3424162b73f43411d3c7b
             } catch (Exception e) {
                 e.printStackTrace();
                 continue;
@@ -121,7 +118,6 @@ public class Downloader extends Thread {
 
         socket.close();
     }
-<<<<<<< HEAD
 
     private void sendStatus(String status) throws IOException {
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
@@ -151,9 +147,7 @@ public class Downloader extends Thread {
 
     private void clear() {
         this.links.clear();
-        this.words.clear();
+        this.words = "";
         this.data = "";
     }
-=======
->>>>>>> fa9aeffdbed5e7fa2df3424162b73f43411d3c7b
 }

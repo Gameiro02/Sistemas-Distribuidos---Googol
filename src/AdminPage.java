@@ -47,7 +47,7 @@ public class AdminPage {
                 socket.receive(packet);
 
                 String msg = new String(packet.getData(), 0, packet.getLength());
-                System.out.println("Received: " + msg);
+                // System.out.println("Received: " + msg);
                 update(msg);
 
                 System.out.println(generatePanelString());

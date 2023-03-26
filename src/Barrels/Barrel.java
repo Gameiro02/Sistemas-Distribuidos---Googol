@@ -24,10 +24,12 @@ import src.Configuration;
 public class Barrel extends Thread implements BarrelInterface, Serializable {
     private String INDEXFILE;
     private String LINKSFILE;
+    private int index;
 
     public Barrel(int index) throws IOException, RemoteException {
         this.INDEXFILE = "src\\Barrels\\BarrelFiles\\Barrel" + index + ".txt";
         this.LINKSFILE = "src\\Barrels\\BarrelFiles\\Links" + index + ".txt";
+        this.index = index;
 
         File f = new File(INDEXFILE);
 
@@ -67,22 +69,15 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 byte[] buffer = new byte[16384];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
-<<<<<<< HEAD
-                sendStatus("Active");
-                String mensagem = new String(packet.getData(), 0, packet.getLength());
-                ArrayList<String> data;
-                data = textParser(mensagem);
-                writeToFile(data);
-                sendStatus("Inactive");
-=======
 
+                sendStatus("Active");
                 String received = new String(packet.getData(), 0, packet.getLength());
 
                 ArrayList<String> data;
                 data = textParser(received);
                 writeToFile(data);
                 writeToLinksFile(data);
->>>>>>> fa9aeffdbed5e7fa2df3424162b73f43411d3c7b
+                sendStatus("Inactive");
             }
 
         } catch (IOException e) {
@@ -135,7 +130,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         if (!found) {
             String context = "";
-            for (int i = 2; i < data.size() && i < Configuration.CONTEXT_SIZE+2; i++) {
+            for (int i = 2; i < data.size() && i < Configuration.CONTEXT_SIZE + 2; i++) {
                 context += data.get(i) + " ";
             }
             String linha;
@@ -151,7 +146,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
     }
 
-    private void writeToFile(ArrayList<String> data) throws IOException {   
+    private void writeToFile(ArrayList<String> data) throws IOException {
         List<String> lines = new ArrayList<String>();
         BufferedReader reader = new BufferedReader(new FileReader(INDEXFILE));
         String line;
@@ -224,7 +219,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 map.remove(key);
             }
         }
-        
+
         // Each string has the format "url;title;context"
         List<String> result = new ArrayList<String>();
         for (String key : map.keySet()) {
@@ -312,14 +307,14 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         // if its active send the url and the ip and port
         // if its waiting send the ip and port
 
-        String statusString = "BARREL " + this.index + ";";
+        String statusString = "BARREL;" + this.index + ";";
 
         if (status == "Active") {
             statusString += "Active";
         } else if (status == "Waiting") {
             statusString += "Waiting;";
         } else {
-            System.out.println("Invalid status");
+            System.out.println("Invalid status barrel");
             socket.close();
             return;
         }
