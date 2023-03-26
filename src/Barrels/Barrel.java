@@ -77,7 +77,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 data = textParser(received);
                 writeToFile(data);
                 writeToLinksFile(data);
-                sendStatus("Inactive");
+                sendStatus("Waiting");
             }
 
         } catch (IOException e) {

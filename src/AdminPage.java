@@ -18,6 +18,8 @@ public class AdminPage {
     private ArrayList<String> barrels;
     private ArrayList<String> mostFrequentSearches;
 
+    private String stringMenu;
+
     public AdminPage() {
         this.downloaders = new ArrayList<String>();
         this.barrels = new ArrayList<String>();
@@ -29,6 +31,7 @@ public class AdminPage {
         // Show a list of active barrels on the right side
         // Show a list of the 10 most frequent searches
         inicialize_arrays();
+        stringMenu = generatePanelString();
         get_active_downloaders_and_barrels();
 
     }
@@ -50,7 +53,11 @@ public class AdminPage {
                 // System.out.println("Received: " + msg);
                 update(msg);
 
-                System.out.println(generatePanelString());
+                // If the new string is different from the old one, update the panel
+                if (!stringMenu.equals(generatePanelString())) {
+                    stringMenu = generatePanelString();
+                    System.out.println(stringMenu);
+                }
             }
 
         } catch (IOException e) {
@@ -68,56 +75,35 @@ public class AdminPage {
         String[] msg_split = msg.split(";");
 
         if (msg_split[0].equals("DOWNLOADER")) {
-            if (msg_split[1].equals("Active")) {
-                this.downloaders.set(Integer.parseInt(msg_split[2]), "Active");
-            } else if (msg_split[1].equals("Waiting")) {
-                this.downloaders.set(Integer.parseInt(msg_split[2]), "Waiting");
+            if (msg_split[2].equals("Active")) {
+                this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, msg_split[3] + ":" + msg_split[4]);
+            } else if (msg_split[2].equals("Waiting")) {
+                this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, "Waiting");
             }
         } else if (msg_split[0].equals("BARREL")) {
-            if (msg_split[1].equals("Active")) {
-                this.barrels.set(Integer.parseInt(msg_split[2]), "Active");
-            } else if (msg_split[1].equals("Waiting")) {
-                this.barrels.set(Integer.parseInt(msg_split[2]), "Waiting");
+            if (msg_split[2].equals("Active")) {
+                this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Active");
+            } else if (msg_split[2].equals("Waiting")) {
+                this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Waiting");
             }
-        } else {
-            System.out.println("Error: " + msg);
         }
     }
 
     private String generatePanelString() {
-        // Define o cabeçalho centralizado
-        String header = String.format("%50s", "Admin page\n");
-
-        // Define o cabeçalho das colunas Downloaders, Barrels e Searches
-        String columnHeader = String.format("%-30s %-30s %s\n", "Downloaders", "Barrels", "Most frequent searches:");
-
-        // Itera sobre todos os Downloaders, Barrels e Searches e os exibe lado a lado
         StringBuilder sb = new StringBuilder();
-        sb.append(header);
-        sb.append(columnHeader);
-        for (int i = 0; i < Configuration.NUM_DOWNLOADERS || i < Configuration.NUM_BARRELS || i < 10; i++) {
-            // Cria a string formatada para o Downloader atual
-            String downloaderStr = "";
-            if (i < Configuration.NUM_DOWNLOADERS) {
-                String downloaderName = "Downloader[" + i + "]: ";
-                downloaderStr = String.format("%-30s", downloaderName + this.downloaders.get(i));
-            }
+        sb.append("------- Downloaders -------\n");
+        for (int i = 0; i < Configuration.NUM_DOWNLOADERS; i++) {
+            sb.append("Downloader[" + i + "] " + this.downloaders.get(i) + "\n");
+        }
 
-            // Cria a string formatada para o Barrel atual
-            String barrelStr = "";
-            if (i < Configuration.NUM_BARRELS) {
-                String barrelName = "Barrel[" + i + "]: ";
-                barrelStr = String.format("%-30s", barrelName + this.barrels.get(i));
-            }
+        sb.append("\n------- Barrels -------\n");
+        for (int i = 0; i < Configuration.NUM_BARRELS; i++) {
+            sb.append("Barrel[" + i + "] " + this.barrels.get(i) + "\n");
+        }
 
-            // Cria a string formatada para a Search atual
-            String searchStr = "";
-            if (i < 10) {
-                searchStr = "- Search[" + i + "]: " + this.mostFrequentSearches.get(i);
-            }
-
-            // Exibe os elementos lado a lado, separados por tabulações
-            sb.append(String.format("%-30s %-30s\t%s\n", downloaderStr, barrelStr, searchStr));
+        sb.append("\n------- Most Frequent Searches -------\n");
+        for (int i = 0; i < 10; i++) {
+            sb.append("Search[" + i + "] " + this.mostFrequentSearches.get(i) + "\n");
         }
 
         return sb.toString();

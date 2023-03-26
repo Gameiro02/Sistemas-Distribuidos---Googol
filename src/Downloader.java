@@ -45,12 +45,14 @@ public class Downloader extends Thread {
 
                 sendStatus("Active");
 
-                System.out.println("Downloader[" + this.ID + "] " + "downloading: " + this.url);
+                // System.out.println("Downloader[" + this.ID + "] " + "downloading: " +
+                // this.url);
                 this.doc = Jsoup.connect(this.url).get();
                 download();
                 sendWords();
 
-                System.out.println("Downloader[" + this.ID + "] " + "downloaded: " + this.url);
+                // System.out.println("Downloader[" + this.ID + "] " + "downloaded: " +
+                // this.url);
                 sendLinkToQueue();
 
                 clear();
@@ -131,7 +133,7 @@ public class Downloader extends Thread {
         if (status == "Active") {
             statusString += "Active;" + this.url + ";" + Configuration.PORT_A;
         } else if (status == "Waiting") {
-            statusString += "Waiting;" + Configuration.PORT_A;
+            statusString += "Waiting;";
         } else {
             System.out.println("Invalid status");
             socket.close();
