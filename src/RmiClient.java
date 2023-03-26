@@ -1,9 +1,6 @@
 package src;
 
-import java.io.*;
-import java.net.*;
 import java.util.*;
-import java.rmi.*;
 
 public class RmiClient {
 
@@ -22,6 +19,7 @@ public class RmiClient {
         Scanner scanner = new Scanner(System.in);
 
         int command = scanner.nextInt();
+        scanner.close();
 
         switch (command) {
             case 1:

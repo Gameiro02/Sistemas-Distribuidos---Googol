@@ -1,76 +1,88 @@
 package src.Barrels;
 
-// Java class to store the index in barrels
-// The class need to import from a file the current links of the barrel
-// The page also need to store in a file the current links of the barrel
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.io.File;
-
-import src.Configuration;
-
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+
+import src.Configuration;
 
 public class Barrel extends Thread implements BarrelInterface, Serializable {
-    private int index; // Numero do barrel para ter um ficehiro so para si
-    private String FILENAME;
+    private String INDEXFILE;
+    private String LINKSFILE;
 
     public Barrel(int index) throws IOException, RemoteException {
-        this.index = index;
-        this.FILENAME = "src\\Barrels\\BarrelFiles\\Barrel" + this.index + ".txt";
+        this.INDEXFILE = "src\\Barrels\\BarrelFiles\\Barrel" + index + ".txt";
+        this.LINKSFILE = "src\\Barrels\\BarrelFiles\\Links" + index + ".txt";
 
-        File f = new File(FILENAME);
+        File f = new File(INDEXFILE);
 
         if (f.exists()) {
-            FileWriter writer = new FileWriter(FILENAME);
+            FileWriter writer = new FileWriter(INDEXFILE);
             writer.write("");
             writer.close();
         } else {
             f.createNewFile();
         }
 
-        try {
-            Naming.rebind("rmi://localhost/Barrel" + index, this);
-        } catch (Exception e) {
-            e.printStackTrace();
+        f = new File(LINKSFILE);
+
+        if (f.exists()) {
+            FileWriter writer = new FileWriter(LINKSFILE);
+            writer.write("");
+            writer.close();
+        } else {
+            f.createNewFile();
         }
+
+        Naming.rebind("rmi://localhost/Barrel" + index, this);
     }
 
     public void run() {
         receive_multicast();
     }
 
-    public void receive_multicast() {
+    private void receive_multicast() {
         MulticastSocket socket = null;
         try {
             socket = new MulticastSocket(Configuration.MULTICAST_PORT);
             InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
             socket.joinGroup(group);
+
             while (true) {
                 byte[] buffer = new byte[16384];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
+<<<<<<< HEAD
                 sendStatus("Active");
                 String mensagem = new String(packet.getData(), 0, packet.getLength());
                 ArrayList<String> data;
                 data = textParser(mensagem);
                 writeToFile(data);
                 sendStatus("Inactive");
+=======
+
+                String received = new String(packet.getData(), 0, packet.getLength());
+
+                ArrayList<String> data;
+                data = textParser(received);
+                writeToFile(data);
+                writeToLinksFile(data);
+>>>>>>> fa9aeffdbed5e7fa2df3424162b73f43411d3c7b
             }
 
         } catch (IOException e) {
@@ -80,52 +92,96 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
     }
 
-    private ArrayList<String> textParser(String text) throws IOException {
-        String[] words = text.split("; ");
+    private ArrayList<String> textParser(String received) {
+        String[] fields = received.split(";");
         ArrayList<String> data = new ArrayList<String>();
 
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
+        data.add(fields[0]); // urls "url|referencedUrl1|referencedUrl2|..."
+        data.add(fields[1]); // title
 
-            // Format: word | link
-            String[] wordAndLink = word.split(" | ");
-            data.add(wordAndLink[0] + " | " + wordAndLink[2]);
+        for (int i = 2; i < fields.length; i++) {
+            data.add(fields[i]);
         }
+
         return data;
     }
 
-    private void writeToFile(ArrayList<String> data) throws IOException {
-        List<String> lines = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new FileReader(FILENAME));
+    private void writeToLinksFile(ArrayList<String> data) throws IOException {
+
+        List<String> lines = new ArrayList<String>();
+        BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE));
         String line;
-        while ((line = br.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             lines.add(line);
         }
-        br.close();
+        reader.close();
 
-        for (String wordAndLink : data) {
-            String wordToAdd = wordAndLink.split(" | ")[0];
-            String linkToAdd = wordAndLink.split(" | ")[2];
+        String[] firstElement = data.get(0).split("\\|"); // url|referencedUrl1|referencedUrl2|...
+        String url = firstElement[0];
+        String otherUrls = "";
+        for (int i = 1; i < firstElement.length; i++) {
+            if (i != firstElement.length - 1)
+                otherUrls += firstElement[i] + "|";
+            else
+                otherUrls += firstElement[i];
+        }
 
+        boolean found = false;
+        for (String linha : lines) {
+            if (linha.equals(url)) {
+                found = true;
+            }
+        }
+
+        if (!found) {
+            String context = "";
+            for (int i = 2; i < data.size() && i < Configuration.CONTEXT_SIZE+2; i++) {
+                context += data.get(i) + " ";
+            }
+            String linha;
+            if (!otherUrls.equals(""))
+                linha = url + "|" + otherUrls + ";" + data.get(1) + ";" + context;
+            else
+                linha = url + ";" + data.get(1) + ";" + context;
+
+            FileWriter writer = new FileWriter(LINKSFILE, true);
+            writer.write(linha);
+            writer.write(System.getProperty("line.separator"));
+            writer.close();
+        }
+    }
+
+    private void writeToFile(ArrayList<String> data) throws IOException {   
+        List<String> lines = new ArrayList<String>();
+        BufferedReader reader = new BufferedReader(new FileReader(INDEXFILE));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            lines.add(line);
+        }
+        reader.close();
+
+        String[] firstElement = data.get(0).split("\\|"); // url|referencedUrl1|referencedUrl2|...
+        String url = firstElement[0];
+
+        for (int i = 2; i < data.size(); i++) {
             boolean found = false;
             for (String linha : lines) {
                 String[] parts = linha.split(";");
                 String word = parts[0];
                 List<String> links = Arrays.asList(parts).subList(1, parts.length);
-                if (word.equals(wordToAdd)) {
-                    if (!links.contains(linkToAdd)) {
-                        lines.set(lines.indexOf(linha), linha + ";" + linkToAdd);
+                if (word.equals(data.get(i))) {
+                    if (!links.contains(url)) {
+                        lines.set(lines.indexOf(linha), linha + ";" + url);
                     }
                     found = true;
                 }
             }
             if (!found) {
-                lines.add(wordToAdd + ";" + linkToAdd);
+                lines.add(data.get(i) + ";" + url);
             }
         }
 
-        // Write to file
-        FileWriter writer = new FileWriter(FILENAME);
+        FileWriter writer = new FileWriter(INDEXFILE);
         for (String linha : lines) {
             writer.write(linha);
             writer.write(System.getProperty("line.separator"));
@@ -133,61 +189,120 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         writer.close();
     }
 
-    // Searches for a single word in the barrel
-    public String searchForWord(String word) throws IOException {
-        // Read file
-        List<String> lines = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new FileReader(FILENAME));
-        String line;
-        while ((line = br.readLine()) != null) {
-            lines.add(line);
-        }
-        br.close();
-
-        // Search for word
-        for (String linha : lines) {
-            String[] parts = linha.split(";");
-            String wordInFile = parts[0];
-            if (wordInFile.equals(word)) {
-                List<String> links = Arrays.asList(parts).subList(1, parts.length);
-                return String.join(";", links);
+    @Override
+    public List<String> searchForWords(String word) throws FileNotFoundException, IOException {
+        // Search for the word in the barrel
+        List<String> lines = new ArrayList<String>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(INDEXFILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
             }
         }
-        return "Word not found";
-    }
-
-    // Searches for multiple words in the barrel
-    @Override
-    public String searchForWords(String words) throws IOException {
-        String[] wordsArray = words.split(" ");
-        HashMap<String, Integer> links = new HashMap<String, Integer>();
-        for (String word : wordsArray) {
-            String linksForWord = searchForWord(word);
-            if (!linksForWord.equals("Word not found")) {
-                String[] linksArray = linksForWord.split(";");
-                for (String link : linksArray) {
-                    if (links.containsKey(link)) {
-                        links.put(link, links.get(link) + 1);
-                    } else {
-                        links.put(link, 1);
+        String words[] = word.split(" ");
+        HashMap<String, Integer> map = new HashMap<String, Integer>();
+        for (String palavra : words) {
+            for (String linha : lines) {
+                String[] parts = linha.split(";");
+                String wordInBarrel = parts[0];
+                List<String> links = Arrays.asList(parts).subList(1, parts.length);
+                if (wordInBarrel.toLowerCase().equals(palavra.toLowerCase())) {
+                    for (String link : links) {
+                        if (map.containsKey(link)) {
+                            map.put(link, map.get(link) + 1);
+                        } else {
+                            map.put(link, 1);
+                        }
                     }
                 }
             }
         }
 
-        // Return only the links that appear in all words
-        HashSet<String> linksSet = new HashSet<String>(Arrays.asList(links.keySet().toArray(new String[0])));
-        for (String link : links.keySet()) {
-            if (links.get(link) != wordsArray.length) {
-                linksSet.remove(link);
+        // Remove links from the map that don't have all the words
+        for (String key : map.keySet()) {
+            if (map.get(key) != words.length) {
+                map.remove(key);
+            }
+        }
+        
+        // Each string has the format "url;title;context"
+        List<String> result = new ArrayList<String>();
+        for (String key : map.keySet()) {
+            String aux = "";
+            try (BufferedReader reader2 = new BufferedReader(new FileReader(LINKSFILE))) {
+                String line2;
+                while ((line2 = reader2.readLine()) != null) {
+                    String[] parts = line2.split(";");
+                    String url = parts[0].split("\\|")[0];
+
+                    String title = parts[1];
+                    String context = parts[2];
+                    if (url.equals(key)) {
+                        aux = url + ";" + title + ";" + context;
+                    }
+                }
+            }
+            result.add(aux);
+        }
+
+        List<String> links_lines = new ArrayList<String>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                links_lines.add(line);
             }
         }
 
-        if (linksSet.size() == 0) {
-            return "No links found";
-        }
+        // Count the number of times each link appears in the barrel
+        // and sort the list by the number of times the link appears
+        Collections.sort(result, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                String[] parts1 = o1.split(";");
+                String[] parts2 = o2.split(";");
+                int count1 = 0;
+                int count2 = 0;
+                for (String linha : links_lines) {
+                    // count the number of times parts1 and parts2 appear in the barrel
+                    String[] parts = linha.split(";");
+                    String[] links = parts[0].split("\\|");
+                    for (String link : links) {
+                        if (link.equals(parts1[0])) {
+                            count1++;
+                        }
+                        if (link.equals(parts2[0])) {
+                            count2++;
+                        }
+                    }
+                }
+                return count2 - count1;
+            }
+        });
 
-        return String.join("\n", linksSet);
+        return result;
+    }
+
+    // Find every link that points to a page
+    @Override
+    public List<String> linksToAPage(String word) throws FileNotFoundException, IOException {
+        List<String> lines = new ArrayList<String>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        List<String> result = new ArrayList<String>();
+        for (String linha : lines) {
+            String[] parts = linha.split(";");
+            String[] links = parts[0].split("\\|");
+            for (int i = 1; i < links.length; i++) {
+                if (links[i].equals(word)) {
+                    result.add(parts[0].split("\\|")[0]);
+                }
+            }
+        }
+        return result;
     }
 
     private void sendStatus(String status) throws IOException {

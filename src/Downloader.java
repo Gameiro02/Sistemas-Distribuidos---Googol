@@ -17,7 +17,8 @@ public class Downloader extends Thread {
     private String url;
     private Document doc;
     private HashSet<String> links;
-    private HashSet<String> words;
+    private String words;
+    private String title;
     private String data;
 
     private int ID;
@@ -25,7 +26,7 @@ public class Downloader extends Thread {
     public Downloader(int ID) {
         this.ID = ID;
         this.links = new HashSet<String>();
-        this.words = new HashSet<String>();
+        this.words = "";
     }
 
     public void run() {
@@ -47,16 +48,17 @@ public class Downloader extends Thread {
                 System.out.println("Downloader[" + this.ID + "] " + "downloading: " + this.url);
                 this.doc = Jsoup.connect(this.url).get();
                 download();
-                convertToString();
                 sendWords();
-                // sendLink();
 
                 System.out.println("Downloader[" + this.ID + "] " + "downloaded: " + this.url);
                 sendLinkToQueue();
+<<<<<<< HEAD
 
                 clear();
                 sendStatus("Waiting");
 
+=======
+>>>>>>> fa9aeffdbed5e7fa2df3424162b73f43411d3c7b
             } catch (Exception e) {
                 e.printStackTrace();
                 continue;
@@ -65,13 +67,15 @@ public class Downloader extends Thread {
     }
 
     private void download() {
+        String title = doc.title();
+        this.title = title;
+
         String[] words = doc.text().split(" ");
         for (String word : words) {
-
             if (word.contains("|") || word.contains(";") || word.contains("\n"))
                 continue;
 
-            this.words.add(word);
+            this.words += word + ";";
         }
 
         Elements links = doc.select("a[href]");
@@ -80,20 +84,17 @@ public class Downloader extends Thread {
         }
     }
 
-    private void convertToString() {
-        String text = "";
-        for (String word : words) {
-            text += word + " | " + this.url + "; ";
-        }
-
-        this.data = text;
-    }
-
     private void sendWords() throws Exception {
+        String referencedUrls = "";
+        for (String link : this.links) {
+            referencedUrls += link + "|";
+        }
+        this.data = this.url + "|" + referencedUrls + ";" + this.title + ";" + this.words;
+
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
-        byte[] buffer = data.getBytes();
+        byte[] buffer = this.data.getBytes();
 
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT);
         socket.send(packet);
@@ -120,6 +121,7 @@ public class Downloader extends Thread {
 
         socket.close();
     }
+<<<<<<< HEAD
 
     private void sendStatus(String status) throws IOException {
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
@@ -152,4 +154,6 @@ public class Downloader extends Thread {
         this.words.clear();
         this.data = "";
     }
+=======
+>>>>>>> fa9aeffdbed5e7fa2df3424162b73f43411d3c7b
 }

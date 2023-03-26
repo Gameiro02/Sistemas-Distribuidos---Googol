@@ -1,7 +1,10 @@
-package src;
+package src.UrlQueue;
 
 import java.io.IOException;
 import java.net.Socket;
+
+import src.Configuration;
+
 import java.io.*;
 import java.net.*;
 
