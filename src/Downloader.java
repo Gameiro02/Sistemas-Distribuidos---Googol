@@ -38,7 +38,6 @@ public class Downloader extends Thread {
             try {
                 this.url = getUrl();
                 if (this.url == null) {
-                    sendStatus("Waiting");
                     System.out.println("No more urls to download");
                     continue;
                 }
@@ -56,6 +55,7 @@ public class Downloader extends Thread {
                 sendLinkToQueue();
 
                 clear();
+                sendStatus("Waiting");
 
             } catch (Exception e) {
                 e.printStackTrace();

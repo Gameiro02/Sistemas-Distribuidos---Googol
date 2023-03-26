@@ -65,11 +65,12 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 byte[] buffer = new byte[16384];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
-
+                sendStatus("Active");
                 String mensagem = new String(packet.getData(), 0, packet.getLength());
                 ArrayList<String> data;
                 data = textParser(mensagem);
                 writeToFile(data);
+                sendStatus("Inactive");
             }
 
         } catch (IOException e) {
@@ -187,6 +188,32 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
 
         return String.join("\n", linksSet);
+    }
+
+    private void sendStatus(String status) throws IOException {
+        InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
+        MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
+
+        // if its active send the url and the ip and port
+        // if its waiting send the ip and port
+
+        String statusString = "BARREL " + this.index + ";";
+
+        if (status == "Active") {
+            statusString += "Active";
+        } else if (status == "Waiting") {
+            statusString += "Waiting;";
+        } else {
+            System.out.println("Invalid status");
+            socket.close();
+            return;
+        }
+
+        byte[] buffer = statusString.getBytes();
+
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT_ADMIN);
+        socket.send(packet);
+        socket.close();
     }
 
 }

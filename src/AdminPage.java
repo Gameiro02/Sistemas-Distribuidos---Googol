@@ -50,11 +50,7 @@ public class AdminPage {
                 System.out.println("Received: " + msg);
                 update(msg);
 
-                // Clear the terminal screen
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
-
-                printPanel();
+                System.out.println(generatePanelString());
             }
 
         } catch (IOException e) {
@@ -88,19 +84,43 @@ public class AdminPage {
         }
     }
 
-    private void printPanel() {
-        System.out.println("Downloaders: ");
-        for (int i = 0; i < Configuration.NUM_DOWNLOADERS; i++) {
-            System.out.println("Downloader[" + i + "] " + this.downloaders.get(i));
+    private String generatePanelString() {
+        // Define o cabeçalho centralizado
+        String header = String.format("%50s", "Admin page\n");
+
+        // Define o cabeçalho das colunas Downloaders, Barrels e Searches
+        String columnHeader = String.format("%-30s %-30s %s\n", "Downloaders", "Barrels", "Most frequent searches:");
+
+        // Itera sobre todos os Downloaders, Barrels e Searches e os exibe lado a lado
+        StringBuilder sb = new StringBuilder();
+        sb.append(header);
+        sb.append(columnHeader);
+        for (int i = 0; i < Configuration.NUM_DOWNLOADERS || i < Configuration.NUM_BARRELS || i < 10; i++) {
+            // Cria a string formatada para o Downloader atual
+            String downloaderStr = "";
+            if (i < Configuration.NUM_DOWNLOADERS) {
+                String downloaderName = "Downloader[" + i + "]: ";
+                downloaderStr = String.format("%-30s", downloaderName + this.downloaders.get(i));
+            }
+
+            // Cria a string formatada para o Barrel atual
+            String barrelStr = "";
+            if (i < Configuration.NUM_BARRELS) {
+                String barrelName = "Barrel[" + i + "]: ";
+                barrelStr = String.format("%-30s", barrelName + this.barrels.get(i));
+            }
+
+            // Cria a string formatada para a Search atual
+            String searchStr = "";
+            if (i < 10) {
+                searchStr = "- Search[" + i + "]: " + this.mostFrequentSearches.get(i);
+            }
+
+            // Exibe os elementos lado a lado, separados por tabulações
+            sb.append(String.format("%-30s %-30s\t%s\n", downloaderStr, barrelStr, searchStr));
         }
-        System.out.println("Barrels: ");
-        for (int i = 0; i < Configuration.NUM_BARRELS; i++) {
-            System.out.println("Barrel[" + i + "] " + this.barrels.get(i));
-        }
-        System.out.println("Most frequent searches: ");
-        for (int i = 0; i < 10; i++) {
-            System.out.println("Search[" + i + "] " + this.mostFrequentSearches.get(i));
-        }
+
+        return sb.toString();
     }
 
     private void inicialize_arrays() {
