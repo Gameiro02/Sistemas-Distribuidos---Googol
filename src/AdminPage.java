@@ -1,6 +1,7 @@
 package src;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.net.*;
 import java.io.IOException;
 
@@ -11,12 +12,14 @@ public class AdminPage {
 
     private ArrayList<String> downloaders;
     private ArrayList<String> barrels;
+    private HashMap<String, Integer> searchDictionary;
 
     private String stringMenu;
 
-    public AdminPage() {
+    public AdminPage(HashMap<String, Integer> searchDictionary) {
         this.downloaders = new ArrayList<String>();
         this.barrels = new ArrayList<String>();
+        this.searchDictionary = searchDictionary;
     }
 
     public void showMenu() {
@@ -96,15 +99,15 @@ public class AdminPage {
         }
 
         sb.append("\n------- Most Frequent Searches -------\n");
-        if (Configuration.searchDictionary.isEmpty()) {
+        if (this.searchDictionary.isEmpty()) {
             for (int i = 0; i < 10; i++)
                 sb.append("Search[" + i + "] None\n");
         } else {
 
             for (int i = 0; i < 10; i++) {
-                if (Configuration.searchDictionary.containsKey(Configuration.searchDictionary.keySet().toArray()[i])) {
-                    sb.append("Search[" + i + "] " + Configuration.searchDictionary.keySet().toArray()[i] + " - "
-                            + Configuration.searchDictionary.get(Configuration.searchDictionary.keySet().toArray()[i])
+                if (this.searchDictionary.containsKey(this.searchDictionary.keySet().toArray()[i])) {
+                    sb.append("Search[" + i + "] " + this.searchDictionary.keySet().toArray()[i] + " - "
+                            + this.searchDictionary.get(this.searchDictionary.keySet().toArray()[i])
                             + "\n");
                 } else {
                     sb.append("Search[" + i + "] None\n");

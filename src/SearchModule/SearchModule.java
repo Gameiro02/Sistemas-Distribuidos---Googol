@@ -19,10 +19,12 @@ import java.util.*;
 
 public class SearchModule extends UnicastRemoteObject implements SearchModuleInterface {
     private AdminPage adminPage;
+    private HashMap<String, Integer> searchDictionary;
 
     public SearchModule() throws RemoteException {
         super();
-        adminPage = new AdminPage();
+        this.searchDictionary = new HashMap<String, Integer>();
+        adminPage = new AdminPage(searchDictionary);
     }
 
     @Override
@@ -31,10 +33,10 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
         List<String> result = barrel.searchForWords(word);
 
-        if (Configuration.searchDictionary.containsKey(word)) {
-            Configuration.searchDictionary.put(word, Configuration.searchDictionary.get(word) + 1);
+        if (this.searchDictionary.containsKey(word)) {
+            this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);
         } else {
-            Configuration.searchDictionary.put(word, 1);
+            this.searchDictionary.put(word, 1);
         }
 
         sortSearchDictionary();
@@ -45,7 +47,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
     private void sortSearchDictionary() {
         // Sort the search dictionary by the number of times a word has been searched
         List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(
-                Configuration.searchDictionary.entrySet());
+                this.searchDictionary.entrySet());
 
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
             public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
@@ -57,7 +59,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         for (Map.Entry<String, Integer> aa : list) {
             temp.put(aa.getKey(), aa.getValue());
         }
-        Configuration.searchDictionary = temp;
+        this.searchDictionary = temp;
     }
 
     @Override

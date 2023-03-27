@@ -66,7 +66,7 @@ public class Downloader extends Thread {
                     sendStatus("Offline");
                     return;
                 } catch (Exception e1) {
-                    e1.printStackTrace();
+                    System.err.println("Faild to send Downloader[" + this.ID + "] status");
                 }
                 continue;
             }

@@ -58,13 +58,13 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     public void run() {
         try {
             sendStatus("Waiting");
+            receive_multicast();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        receive_multicast();
     }
 
-    private void receive_multicast() {
+    private void receive_multicast() throws IOException {
         MulticastSocket socket = null;
         try {
             socket = new MulticastSocket(Configuration.MULTICAST_PORT);
@@ -88,13 +88,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
-            try {
-                sendStatus("Offline");
-                return;
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            sendStatus("Offline");
+            return;
         } finally {
             socket.close();
         }
@@ -247,7 +242,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
     // Find every link that points to a page
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException {
-        // this.linksMap format: url -> [title, context, referencedUrl1, referencedUrl2, ...]
+        // this.linksMap format: url -> [title, context, referencedUrl1, referencedUrl2,
+        // ...]
         List<String> result = new ArrayList<String>();
 
         for (String url : this.linksMap.keySet()) {
@@ -325,7 +321,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             String result = key + ";" + info.get(0) + ";" + info.get(1);
             results.add(result);
         }
-
 
         // Count the number of times each url is referenced in the keys of linksMap
         Collections.sort(results, new Comparator<String>() {
