@@ -3,7 +3,9 @@ package src;
 import java.util.*;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.io.*;
+import java.net.MalformedURLException;
 
 import src.SearchModule.SearchModuleInterface;
 
@@ -27,16 +29,25 @@ public class RmiClient {
                     String url = scanner.nextLine();
                     break;
                 case 2:
-                    System.out.print("Insira os termos a serem pesquisados: ");
-                    scanner.nextLine();
-                    String words = scanner.nextLine();
-                    System.out.println(searchModule.searchForWords(words));
+                    searchWord(searchModule, scanner);
                     break;
                 case 3:
-                    checkLogin(searchModule, scanner);
+                    System.out.println(
+                            "====================================================================================");
+                    checkLogin(searchModule, scanner, 3);
+                    System.out.println(
+                            "====================================================================================");
+                    System.out.println("Digite 6 para exibir o menu novamente");
+                    System.out.print("Digite o comando desejado: ");
                     break;
                 case 4:
+                    System.out.println(
+                            "====================================================================================");
                     System.out.println(searchModule.getStringMenu());
+                    System.out.println(
+                            "====================================================================================");
+                    System.out.println("Digite 6 para exibir o menu novamente");
+                    System.out.print("Digite o comando desejado: ");
                     break;
                 case 5:
                     exit = true;
@@ -45,7 +56,9 @@ public class RmiClient {
                     printMenu();
                     break;
                 case 7:
-                    checkLogin(searchModule, scanner);
+                    checkLogin(searchModule, scanner, 7);
+                    System.out.println("Digite 6 para exibir o menu novamente");
+                    System.out.print("Digite o comando desejado: ");
                     break;
                 default:
                     System.out.println("Comando inválido");
@@ -58,9 +71,72 @@ public class RmiClient {
         scanner.close();
     }
 
-    private void checkLogin(SearchModuleInterface searchModule, Scanner scanner)
+    private void searchWord(SearchModuleInterface searchModule, Scanner scanner)
+            throws RemoteException, MalformedURLException, NotBoundException, FileNotFoundException, IOException {
+
+        System.out.print("Insira os termos a serem pesquisados: ");
+        scanner.nextLine();
+        String words = scanner.nextLine();
+
+        int pageNumber = 1;
+        while (true) {
+            List<String> resultList = searchModule.searchForWords(words, pageNumber);
+
+            System.out.println("====================================================================================");
+            System.out.println("Resultados da pesquisa:");
+
+            if (resultList.isEmpty() && pageNumber == 1) {
+                System.out.println("Nenhum resultado encontrado");
+                System.out.println(
+                        "====================================================================================");
+                System.out.println("Digite 6 para exibir o menu novamente");
+                System.out.print("Digite o comando desejado: ");
+                break;
+            } else if (resultList.isEmpty()) {
+                System.out.println("Não há mais resultados");
+                System.out.println(
+                        "====================================================================================");
+                System.out.println("Digite 6 para exibir o menu novamente");
+                System.out.print("Digite o comando desejado: ");
+                break;
+            }
+
+            for (String result : resultList) {
+                String[] fields = result.split(";");
+                System.out.println("Link: " + fields[0]);
+                System.out.println("Título: " + fields[1]);
+                System.out.println("Descrição: " + fields[2] + "\n");
+            }
+
+            if (resultList.size() < 10) {
+                System.out.println("Não há mais resultados");
+                System.out.println(
+                        "====================================================================================");
+                System.out.println("Digite 6 para exibir o menu novamente");
+                System.out.print("Digite o comando desejado: ");
+                return;
+            }
+
+            System.out.println("====================================================================================");
+
+            System.out.println("Próxima página? (s/n)");
+            String next = scanner.nextLine();
+            if (next.equals("s"))
+                pageNumber++;
+            else {
+                System.out.println(
+                        "====================================================================================");
+                System.out.println("Digite 6 para exibir o menu novamente");
+                System.out.print("Digite o comando desejado: ");
+                return;
+            }
+        }
+    }
+
+    private void checkLogin(SearchModuleInterface searchModule, Scanner scanner, int command)
             throws FileNotFoundException, IOException, NotBoundException {
-        if (!login) {
+        boolean justLogged = false;
+        if (!login && command == 3) {
             System.out.println("Para utilizar esta função, é necessário estar logado");
             System.out.print("Insira o nome de usuário: ");
             scanner.nextLine();
@@ -70,16 +146,31 @@ public class RmiClient {
 
             if (isValid(username, password, Configuration.CREDENTIALS_FILE)) {
                 System.out.println("Login realizado com sucesso");
+                System.out.println(
+                        "====================================================================================");
                 login = true;
+                justLogged = true;
             } else {
                 System.out.println("Login inválido");
+                return;
             }
+        }
 
-        } else {
+        if (login && command == 3) {
+            if (!justLogged)
+                scanner.nextLine();
             System.out.print("Insira o link da página: ");
-            scanner.nextLine();
-            String link = scanner.nextLine();
-            System.out.println(searchModule.linksToAPage(link));
+            String url = scanner.nextLine();
+            List<String> links = (searchModule.linksToAPage(url));
+
+            if (links.isEmpty()) {
+                System.out.println("Nenhum resultado encontrado");
+            } else {
+                System.out.println("Resultados da pesquisa:");
+                for (String link : links) {
+                    System.out.println(link);
+                }
+            }
         }
     }
 
@@ -113,23 +204,21 @@ public class RmiClient {
             FileInputStream fileIn = new FileInputStream(filename);
             ObjectInputStream in = new ObjectInputStream(fileIn);
 
-            while (true) {
-                String user;
-                String pass;
+            String user;
+            String pass;
 
-                // read user and password
-                user = (String) in.readObject();
-                pass = (String) in.readObject();
+            user = (String) in.readObject();
+            pass = (String) in.readObject();
 
-                if (user.equals(username) && pass.equals(password)) {
-                    valid = true;
-                    in.close();
-                    break;
-                }
-
+            if (user.equals(username) && pass.equals(password)) {
+                valid = true;
             }
+
+            in.close();
+
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Erro ao ler arquivo de credenciais");
+            e.printStackTrace();
         }
         return valid;
     }

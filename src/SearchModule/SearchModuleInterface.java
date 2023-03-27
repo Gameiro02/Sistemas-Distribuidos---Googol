@@ -9,7 +9,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface SearchModuleInterface extends Remote {
-    public List<String> searchForWords(String words)
+    public List<String> searchForWords(String words, int pageNumber)
             throws RemoteException, MalformedURLException, NotBoundException, FileNotFoundException, IOException;
 
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException, NotBoundException;

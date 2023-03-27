@@ -6,10 +6,6 @@ import java.net.*;
 import java.io.IOException;
 
 public class AdminPage {
-    // Lista de Downloaders ativos -> cada downloadter tem de mostrar o ip e o porto
-    // Lista de Barrels ativos
-    // 10 pesquisas mais frequentes
-
     private ArrayList<String> downloaders;
     private ArrayList<String> barrels;
     private HashMap<String, Integer> searchDictionary;
@@ -23,9 +19,6 @@ public class AdminPage {
     }
 
     public void showMenu() {
-        // Show a list of active downloaders on the left side
-        // Show a list of active barrels on the right side
-        // Show a list of the 10 most frequent searches
         inicialize_arrays();
         stringMenu = generatePanelString();
         get_active_downloaders_and_barrels();
@@ -46,7 +39,6 @@ public class AdminPage {
                 socket.receive(packet);
 
                 String msg = new String(packet.getData(), 0, packet.getLength());
-                // System.out.println("Received: " + msg);
                 update(msg);
 
                 stringMenu = generatePanelString();
@@ -60,10 +52,6 @@ public class AdminPage {
     }
 
     private void update(String msg) {
-        // Update the list of active downloaders
-        // Update the list of active barrels
-        // Update the list of the 10 most frequent searches
-
         String[] msg_split = msg.split(";");
 
         if (msg_split[0].equals("DOWNLOADER")) {
@@ -106,11 +94,9 @@ public class AdminPage {
 
             for (int i = 0; i < 10 && i < this.searchDictionary.size(); i++) {
                 if (this.searchDictionary.containsKey(this.searchDictionary.keySet().toArray()[i])) {
-                    sb.append("Search[" + i + "] " + this.searchDictionary.keySet().toArray()[i] + " - "
+                    sb.append("Search[" + i+1 + "] " + this.searchDictionary.keySet().toArray()[i] + " - "
                             + this.searchDictionary.get(this.searchDictionary.keySet().toArray()[i])
                             + "\n");
-                } else {
-                    sb.append("Search[" + i + "] None\n");
                 }
             }
         }
