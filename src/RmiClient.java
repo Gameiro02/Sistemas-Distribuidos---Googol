@@ -25,6 +25,7 @@ public class RmiClient {
                     System.out.print("Insira o link da página: ");
                     scanner.nextLine();
                     String url = scanner.nextLine();
+                    searchModule.IndexarUmNovoUrl(url);
                     break;
                 case 2:
                     System.out.print("Insira os termos a serem pesquisados: ");

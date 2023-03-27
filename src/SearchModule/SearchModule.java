@@ -16,6 +16,19 @@ import src.Barrels.Barrel;
 import src.Barrels.BarrelInterface;
 import src.AdminPage;
 
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.util.HashSet;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.net.*;
+import java.io.*;
+
 import java.util.*;
 
 public class SearchModule extends UnicastRemoteObject implements SearchModuleInterface {
@@ -71,6 +84,19 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
         List<String> result = barrel.linksToAPage(word);
         return result;
+    }
+
+    @Override
+    public void IndexarUmNovoUrl(String url) throws RemoteException, IOException, NotBoundException {
+        // Send the url to the urlqueue and the downloader will take care of the rest
+        // via tcp
+        Socket socket = new Socket("localhost", Configuration.PORT_B);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        out.println(url);
+
+        out.close();
+        socket.close();
     }
 
     public static void main(String[] args) throws IOException, NotBoundException {
