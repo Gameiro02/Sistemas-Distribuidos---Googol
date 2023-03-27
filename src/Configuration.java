@@ -22,4 +22,6 @@ public class Configuration {
     public static String MULTICAST_ADDRESS_ADMIN = "224.3.2.2";
     public static int MULTICAST_PORT_ADMIN = 4333;
     public static int CONTEXT_SIZE = 15;
+
+    public static HashMap<String, Integer> searchDictionary = new HashMap<String, Integer>();
 }

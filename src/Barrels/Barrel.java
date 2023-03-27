@@ -92,8 +92,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 writeToFile(data);
                 writeToLinksFile(data);
                 writeToHashMaps(data);
-                System.out.println("Index: " + indexMap);
-                System.out.println("Links: " + linksMap);
                 sendStatus("Waiting");
             }
 
@@ -307,7 +305,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
     @Override
     public List<String> searchForWords(String word) throws FileNotFoundException, IOException {
-        System.out.println("Searching for " + word);
         String words[] = word.split(" ");
         auxMap.clear();
 
@@ -325,10 +322,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         }
 
-        for (String key : auxMap.keySet()) {
-            System.out.println(key + " " + auxMap.get(key));
-        }
-
         // Remove links from the map that don't have all the words
         Iterator<String> iterator = auxMap.keySet().iterator();
         while (iterator.hasNext()) {
@@ -337,10 +330,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 iterator.remove();
             }
         }
-        for (String key : auxMap.keySet()) {
-            System.out.println(key + " " + auxMap.get(key));
-        }
-
 
         // Each string has the format "url;title;context"
         ArrayList<String> results = new ArrayList<String>();
@@ -374,9 +363,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         });
 
-        for (String result : results) {
-            System.out.println(result);
-        }
         return results;
     }
 

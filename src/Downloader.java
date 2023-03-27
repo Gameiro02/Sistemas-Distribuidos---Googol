@@ -61,7 +61,7 @@ public class Downloader extends Thread {
                     throw new Exception();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Downloader[" + this.ID + "] stopped working!");
                 try {
                     sendStatus("Offline");
                     return;
