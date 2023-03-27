@@ -5,8 +5,6 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 
-import src.Barrels.Barrel;
-
 import src.SearchModule.SearchModule;
 
 public class Programa {
