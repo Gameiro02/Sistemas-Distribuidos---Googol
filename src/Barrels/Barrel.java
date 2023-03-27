@@ -41,21 +41,13 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         File f = new File(INDEXFILE);
 
-        if (f.exists()) {
-            FileWriter writer = new FileWriter(INDEXFILE);
-            writer.write("");
-            writer.close();
-        } else {
+        if (!f.exists()) {
             f.createNewFile();
         }
 
         f = new File(LINKSFILE);
 
-        if (f.exists()) {
-            FileWriter writer = new FileWriter(LINKSFILE);
-            writer.write("");
-            writer.close();
-        } else {
+        if (!f.exists()) {
             f.createNewFile();
         }
 
