@@ -24,4 +24,6 @@ public class Configuration {
     public static int CONTEXT_SIZE = 5;
 
     public static HashMap<String, Integer> searchDictionary = new HashMap<String, Integer>();
+
+    public static String LONGIN_FILE = "login.bin";
 }
