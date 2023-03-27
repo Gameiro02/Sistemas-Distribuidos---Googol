@@ -15,7 +15,11 @@ import src.Barrels.Barrel;
 import src.Barrels.BarrelInterface;
 import src.AdminPage;
 
+import java.util.ArrayList;
+
 public class SearchModule extends UnicastRemoteObject implements SearchModuleInterface {
+
+    private ArrayList<String> lista_palavras_pesquisadas;
 
     public SearchModule() throws RemoteException {
         super();
@@ -45,12 +49,14 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         for (int i = 1; i <= Configuration.NUM_BARRELS; i++) {
             Barrel b = new Barrel(i);
             b.start();
+
             // System.out.println("Barrel " + i + " is ready.");
         }
 
         for (int i = 1; i <= Configuration.NUM_DOWNLOADERS; i++) {
             Downloader d = new Downloader(i);
             d.start();
+
             // System.out.println("Downloader " + i + " is ready.");
         }
 

@@ -82,7 +82,8 @@ public class AdminPage {
             }
         } else if (msg_split[0].equals("BARREL")) {
             if (msg_split[2].equals("Active")) {
-                this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Active");
+                this.barrels.set(Integer.parseInt(msg_split[1]) - 1,
+                        "Active" + ":" + msg_split[3] + ":" + msg_split[4]);
             } else if (msg_split[2].equals("Waiting")) {
                 this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Waiting");
             }

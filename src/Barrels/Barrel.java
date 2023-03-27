@@ -55,6 +55,11 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     public void run() {
+        try {
+            sendStatus("Waiting");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         receive_multicast();
     }
 
@@ -77,7 +82,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 data = textParser(received);
                 writeToFile(data);
                 writeToLinksFile(data);
-                sendStatus("Waiting");
             }
 
         } catch (IOException e) {
@@ -310,7 +314,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         String statusString = "BARREL;" + this.index + ";";
 
         if (status == "Active") {
-            statusString += "Active";
+            statusString += "Active;" + Configuration.MULTICAST_ADDRESS + ";" + Configuration.MULTICAST_PORT + ";";
         } else if (status == "Waiting") {
             statusString += "Waiting;";
         } else {

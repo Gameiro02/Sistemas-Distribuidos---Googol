@@ -56,7 +56,6 @@ public class Downloader extends Thread {
                 sendLinkToQueue();
 
                 clear();
-                sendStatus("Waiting");
 
             } catch (Exception e) {
                 e.printStackTrace();
