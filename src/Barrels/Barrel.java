@@ -27,8 +27,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     private String INDEXFILE;
     private String LINKSFILE;
     private int index;
-    private HashMap<String, ArrayList<String>> indexMap;
-    private HashMap<String, ArrayList<String>> linksMap;
+    private HashMap<String, ArrayList<String>> indexMap; // <<word>, <url1, url2, ...>>
+    private HashMap<String, ArrayList<String>> linksMap; // <<url>, <title, description, url1, url2, ...>>
     private HashMap<String, Integer> auxMap;
 
     public Barrel(int index) throws IOException, RemoteException {
@@ -255,23 +255,18 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
     // Find every link that points to a page
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException {
-        List<String> lines = new ArrayList<String>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        }
+        // this.linksMap format: url -> [title, context, referencedUrl1, referencedUrl2, ...]
         List<String> result = new ArrayList<String>();
-        for (String linha : lines) {
-            String[] parts = linha.split(";");
-            String[] links = parts[0].split("\\|");
-            for (int i = 1; i < links.length; i++) {
-                if (links[i].equals(word)) {
-                    result.add(parts[0].split("\\|")[0]);
+
+        for (String url : this.linksMap.keySet()) {
+            ArrayList<String> info = this.linksMap.get(url);
+            for (int i = 2; i < info.size(); i++) {
+                if (info.get(i).equals(word)) {
+                    result.add(url);
                 }
             }
         }
+
         return result;
     }
 
