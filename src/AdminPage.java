@@ -54,7 +54,6 @@ public class AdminPage {
                 update(msg);
 
                 stringMenu = generatePanelString();
-                System.out.println(stringMenu);
             }
 
         } catch (IOException e) {
@@ -131,6 +130,10 @@ public class AdminPage {
         for (int i = 0; i < Configuration.NUM_BARRELS; i++) {
             this.barrels.add("Waiting");
         }
+    }
+
+    public String getStringMenu() {
+        return this.stringMenu;
     }
 
 }

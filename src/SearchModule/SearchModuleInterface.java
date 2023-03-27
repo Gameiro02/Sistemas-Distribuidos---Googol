@@ -13,4 +13,6 @@ public interface SearchModuleInterface extends Remote {
             throws RemoteException, MalformedURLException, NotBoundException, FileNotFoundException, IOException;
 
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException, NotBoundException;
+
+    public String getStringMenu() throws RemoteException;
 }

@@ -18,9 +18,11 @@ import src.AdminPage;
 import java.util.*;
 
 public class SearchModule extends UnicastRemoteObject implements SearchModuleInterface {
+    private AdminPage adminPage;
 
     public SearchModule() throws RemoteException {
         super();
+        adminPage = new AdminPage();
     }
 
     @Override
@@ -86,12 +88,15 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
                 // Enviar o url para o outro downloader
                 e.printStackTrace();
             }
-
             // System.out.println("Downloader " + i + " is ready.");
         }
 
-        AdminPage adminPage = new AdminPage();
-        adminPage.showMenu();
+        searchModule.adminPage.showMenu();
+    }
+
+    @Override
+    public String getStringMenu() throws RemoteException {
+        return adminPage.getStringMenu();
     }
 
 }

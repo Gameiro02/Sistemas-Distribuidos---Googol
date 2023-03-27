@@ -1,10 +1,16 @@
 package src;
 
 import java.util.*;
+import java.rmi.Naming;
+
+import src.SearchModule.SearchModuleInterface;
 
 public class RmiClient {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+
+        SearchModuleInterface searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
+
         System.out.println(" ========================================MENU========================================");
         System.out.println("| Comando:      Descrição:                                                           |");
         System.out.println("| -----------------------------------------------------------------------------------|");
@@ -33,7 +39,7 @@ public class RmiClient {
                         "Opcao selecionada: 3 - Consultar listas de paginas com ligação para um página expecifica");
                 break;
             case 4:
-                System.out.println("Opcao selecionada: 4 - Abrir página de administração atualizada em tempo real");
+                System.out.println(searchModule.getStringMenu());
                 break;
             case 5:
                 System.out.println("Opcao selecionada: 5 - Sair");
