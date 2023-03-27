@@ -15,4 +15,6 @@ public interface SearchModuleInterface extends Remote {
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException, NotBoundException;
 
     public String getStringMenu() throws RemoteException;
+
+    public void IndexarUmNovoUrl(String url) throws RemoteException, IOException, NotBoundException;
 }
