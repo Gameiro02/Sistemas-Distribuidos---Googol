@@ -71,6 +71,8 @@ public class RmiClient {
             if (isValid(username, password, Configuration.CREDENTIALS_FILE)) {
                 System.out.println("Login realizado com sucesso");
                 login = true;
+            } else {
+                System.out.println("Login inválido");
             }
 
         } else {

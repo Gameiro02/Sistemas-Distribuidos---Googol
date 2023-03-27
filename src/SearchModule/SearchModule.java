@@ -61,6 +61,8 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             temp.put(aa.getKey(), aa.getValue());
         }
         this.searchDictionary = temp;
+
+        adminPage.updateHashMap(temp);
     }
 
     @Override
@@ -95,6 +97,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             // System.out.println("Downloader " + i + " is ready.");
         }
 
+        searchModule.adminPage = new AdminPage(searchModule.searchDictionary);
         searchModule.adminPage.showMenu();
     }
 

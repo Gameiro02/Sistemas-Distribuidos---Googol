@@ -104,7 +104,7 @@ public class AdminPage {
                 sb.append("Search[" + i + "] None\n");
         } else {
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10 && i < this.searchDictionary.size(); i++) {
                 if (this.searchDictionary.containsKey(this.searchDictionary.keySet().toArray()[i])) {
                     sb.append("Search[" + i + "] " + this.searchDictionary.keySet().toArray()[i] + " - "
                             + this.searchDictionary.get(this.searchDictionary.keySet().toArray()[i])
@@ -126,6 +126,12 @@ public class AdminPage {
         for (int i = 0; i < Configuration.NUM_BARRELS; i++) {
             this.barrels.add("Waiting");
         }
+    }
+
+    public void updateHashMap(HashMap<String, Integer> dic) {
+
+        this.searchDictionary = dic;
+        stringMenu = generatePanelString();
     }
 
     public String getStringMenu() {
