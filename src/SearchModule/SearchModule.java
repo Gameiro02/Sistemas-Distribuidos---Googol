@@ -1,13 +1,14 @@
 package src.SearchModule;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 
 import src.Configuration;
 import src.Downloader;
@@ -72,6 +73,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 
     public static void main(String[] args) throws IOException, NotBoundException {
         SearchModule searchModule = new SearchModule();
+        writeCredentials();
         LocateRegistry.createRegistry(1099);
         Naming.rebind("SearchModule", searchModule);
 
@@ -94,6 +96,20 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         }
 
         searchModule.adminPage.showMenu();
+    }
+
+    private static void writeCredentials() {
+        try {
+            FileOutputStream fileOut = new FileOutputStream(Configuration.CREDENTIALS_FILE);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(Configuration.LOGIN);
+            out.writeObject(Configuration.PASSWORD);
+            out.close();
+            fileOut.close();
+            System.out.println("Successfully wrote login credentials to file " + Configuration.CREDENTIALS_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

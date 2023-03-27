@@ -2,9 +2,7 @@ package src;
 
 import java.util.*;
 import java.rmi.Naming;
-import java.rmi.RemoteException;
-
-import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.io.*;
 
 import src.SearchModule.SearchModuleInterface;
@@ -35,25 +33,7 @@ public class RmiClient {
                     System.out.println(searchModule.searchForWords(words));
                     break;
                 case 3:
-                    if (!login) {
-                        System.out.println("Para utilizar esta função, é necessário estar logado");
-                        System.out.print("Insira o nome de usuário: ");
-                        scanner.nextLine();
-                        String username = scanner.nextLine();
-                        System.out.print("Insira a senha: ");
-                        String password = scanner.nextLine();
-
-                        if (isValid(username, password, Configuration.LONGIN_FILE)) {
-                            System.out.println("Login realizado com sucesso");
-                            login = true;
-                        }
-
-                    } else {
-                        System.out.print("Insira o link da página: ");
-                        scanner.nextLine();
-                        String link = scanner.nextLine();
-                        System.out.println(searchModule.linksToAPage(link));
-                    }
+                    checkLogin(searchModule, scanner);
                     break;
                 case 4:
                     System.out.println(searchModule.getStringMenu());
@@ -65,22 +45,7 @@ public class RmiClient {
                     printMenu();
                     break;
                 case 7:
-                    if (login) {
-                        System.out.println("O usuário já está logado");
-                        break;
-                    }
-
-                    System.out.print("Insira o nome de usuário: ");
-                    scanner.nextLine();
-                    String username = scanner.nextLine();
-                    System.out.print("Insira a senha: ");
-                    String password = scanner.nextLine();
-
-                    if (isValid(username, password, Configuration.LONGIN_FILE)) {
-                        System.out.println("Login realizado com sucesso");
-                        login = true;
-                    }
-
+                    checkLogin(searchModule, scanner);
                     break;
                 default:
                     System.out.println("Comando inválido");
@@ -93,12 +58,34 @@ public class RmiClient {
         scanner.close();
     }
 
+    private void checkLogin(SearchModuleInterface searchModule, Scanner scanner)
+            throws FileNotFoundException, IOException, NotBoundException {
+        if (!login) {
+            System.out.println("Para utilizar esta função, é necessário estar logado");
+            System.out.print("Insira o nome de usuário: ");
+            scanner.nextLine();
+            String username = scanner.nextLine();
+            System.out.print("Insira a senha: ");
+            String password = scanner.nextLine();
+
+            if (isValid(username, password, Configuration.CREDENTIALS_FILE)) {
+                System.out.println("Login realizado com sucesso");
+                login = true;
+            }
+
+        } else {
+            System.out.print("Insira o link da página: ");
+            scanner.nextLine();
+            String link = scanner.nextLine();
+            System.out.println(searchModule.linksToAPage(link));
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         SearchModuleInterface searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
 
         RmiClient client = new RmiClient();
         client.login = false;
-        client.writeToBinaryFile("admin", "admin", Configuration.LONGIN_FILE);
 
         client.run(searchModule);
 
@@ -134,32 +121,15 @@ public class RmiClient {
 
                 if (user.equals(username) && pass.equals(password)) {
                     valid = true;
+                    in.close();
                     break;
                 }
 
             }
-        } catch (EOFException e) {
-            // Reached end of file
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Erro ao ler arquivo de credenciais");
         }
         return valid;
-    }
-
-    private void writeToBinaryFile(String username, String password, String filename) {
-        try {
-            FileOutputStream fileOut = new FileOutputStream(filename);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(username);
-            out.writeObject(password);
-            out.close();
-            fileOut.close();
-            System.out.println("Successfully wrote login credentials to file " + filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 }
