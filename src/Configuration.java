@@ -1,5 +1,7 @@
 package src;
 
+import java.util.HashMap;
+
 public class Configuration {
     public static final String login = "tintin";
     public static final String password = "unicorn";
@@ -20,4 +22,6 @@ public class Configuration {
     public static String MULTICAST_ADDRESS_ADMIN = "224.3.2.2";
     public static int MULTICAST_PORT_ADMIN = 4333;
     public static int CONTEXT_SIZE = 5;
+
+    public static HashMap<String, Integer> searchDictionary = new HashMap<String, Integer>();
 }

@@ -29,7 +29,7 @@ public class Downloader extends Thread {
         this.words = "";
     }
 
-    public void run() {
+    public void run() throws RuntimeException {
         try {
             sendStatus("Waiting");
         } catch (Exception e) {
@@ -57,8 +57,16 @@ public class Downloader extends Thread {
 
                 clear();
 
+                if (this.ID == 1) {
+                    throw new Exception();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+                try {
+                    sendStatus("Offline");
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
                 continue;
             }
         }
@@ -133,6 +141,8 @@ public class Downloader extends Thread {
             statusString += "Active;" + this.url + ";" + Configuration.PORT_A;
         } else if (status == "Waiting") {
             statusString += "Waiting;";
+        } else if (status == "Offline") {
+            statusString += "Offline";
         } else {
             System.out.println("Invalid status");
             socket.close();

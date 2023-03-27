@@ -86,6 +86,11 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         } catch (IOException e) {
             e.printStackTrace();
+            try {
+                sendStatus("Offline");
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
         } finally {
             socket.close();
         }
@@ -317,6 +322,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             statusString += "Active;" + Configuration.MULTICAST_ADDRESS + ";" + Configuration.MULTICAST_PORT + ";";
         } else if (status == "Waiting") {
             statusString += "Waiting;";
+        } else if (status == "Offline") {
+            statusString += "Offline";
         } else {
             System.out.println("Invalid status barrel");
             socket.close();

@@ -15,11 +15,9 @@ import src.Barrels.Barrel;
 import src.Barrels.BarrelInterface;
 import src.AdminPage;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class SearchModule extends UnicastRemoteObject implements SearchModuleInterface {
-
-    private ArrayList<String> lista_palavras_pesquisadas;
 
     public SearchModule() throws RemoteException {
         super();
@@ -30,7 +28,34 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         int randomBarrel = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
         BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
         List<String> result = barrel.searchForWords(word);
+
+        if (Configuration.searchDictionary.containsKey(word)) {
+            Configuration.searchDictionary.put(word, Configuration.searchDictionary.get(word) + 1);
+        } else {
+            Configuration.searchDictionary.put(word, 1);
+        }
+
+        sortSearchDictionary();
+
         return result;
+    }
+
+    private void sortSearchDictionary() {
+        // Sort the search dictionary by the number of times a word has been searched
+        List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(
+                Configuration.searchDictionary.entrySet());
+
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return (o2.getValue()).compareTo(o1.getValue());
+            }
+        });
+
+        HashMap<String, Integer> temp = new LinkedHashMap<String, Integer>();
+        for (Map.Entry<String, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        Configuration.searchDictionary = temp;
     }
 
     @Override
@@ -55,7 +80,12 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 
         for (int i = 1; i <= Configuration.NUM_DOWNLOADERS; i++) {
             Downloader d = new Downloader(i);
-            d.start();
+            try {
+                d.start();
+            } catch (Exception e) {
+                // Enviar o url para o outro downloader
+                e.printStackTrace();
+            }
 
             // System.out.println("Downloader " + i + " is ready.");
         }
@@ -63,4 +93,5 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         AdminPage adminPage = new AdminPage();
         adminPage.showMenu();
     }
+
 }
