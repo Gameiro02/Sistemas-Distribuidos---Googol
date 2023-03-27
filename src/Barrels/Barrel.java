@@ -12,11 +12,13 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import src.Configuration;
@@ -25,11 +27,17 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     private String INDEXFILE;
     private String LINKSFILE;
     private int index;
+    private HashMap<String, ArrayList<String>> indexMap;
+    private HashMap<String, ArrayList<String>> linksMap;
+    private HashMap<String, Integer> auxMap;
 
     public Barrel(int index) throws IOException, RemoteException {
         this.INDEXFILE = "src\\Barrels\\BarrelFiles\\Barrel" + index + ".txt";
         this.LINKSFILE = "src\\Barrels\\BarrelFiles\\Links" + index + ".txt";
         this.index = index;
+        this.indexMap = new HashMap<>();
+        this.linksMap = new HashMap<>();
+        this.auxMap = new HashMap<>();
 
         File f = new File(INDEXFILE);
 
@@ -51,6 +59,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             f.createNewFile();
         }
 
+        UnicastRemoteObject.exportObject(this, 0);
         Naming.rebind("rmi://localhost/Barrel" + index, this);
     }
 
@@ -77,6 +86,9 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 data = textParser(received);
                 writeToFile(data);
                 writeToLinksFile(data);
+                writeToHashMaps(data);
+                System.out.println("Index: " + indexMap);
+                System.out.println("Links: " + linksMap);
                 sendStatus("Waiting");
             }
 
@@ -99,6 +111,52 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
 
         return data;
+    }
+
+    private void writeToHashMaps(ArrayList<String> data) {
+        synchronized (indexMap) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(INDEXFILE));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(";");
+                    String word = parts[0].toLowerCase();
+                    ArrayList<String> urls = new ArrayList<>();
+                    for (int i = 1; i < parts.length; i++) {
+                        urls.add(parts[i]);
+                    }
+                    indexMap.put(word, urls);
+                }
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        synchronized (linksMap) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(";");
+                    String urlString = parts[0];
+
+                    ArrayList<String> info = new ArrayList<>();
+                    info.add(parts[1]); // title
+                    info.add(parts[2]); // context
+
+                    String[] urlParts = urlString.split("\\|");
+                    for (int i = 1; i < urlParts.length; i++) {
+                        info.add(urlParts[i]);
+                    }
+
+                    linksMap.put(urlString.split("\\|")[0], info);
+                }
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void writeToLinksFile(ArrayList<String> data) throws IOException {
@@ -129,15 +187,17 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
 
         if (!found) {
+            int titleSize = data.get(1).split(" ").length;
             String context = "";
-            for (int i = 2; i < data.size() && i < Configuration.CONTEXT_SIZE + 2; i++) {
+            for (int i = 2 + titleSize; i < data.size() && i < Configuration.CONTEXT_SIZE + 2 + titleSize; i++) {
                 context += data.get(i) + " ";
             }
             String linha;
-            if (!otherUrls.equals(""))
+            if (!otherUrls.equals("")) {
                 linha = url + "|" + otherUrls + ";" + data.get(1) + ";" + context;
-            else
+            } else {
                 linha = url + ";" + data.get(1) + ";" + context;
+            }
 
             FileWriter writer = new FileWriter(LINKSFILE, true);
             writer.write(linha);
@@ -162,9 +222,9 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             boolean found = false;
             for (String linha : lines) {
                 String[] parts = linha.split(";");
-                String word = parts[0];
+                String word = parts[0].toLowerCase();
                 List<String> links = Arrays.asList(parts).subList(1, parts.length);
-                if (word.equals(data.get(i))) {
+                if (word.equals(data.get(i).toLowerCase())) {
                     if (!links.contains(url)) {
                         lines.set(lines.indexOf(linha), linha + ";" + url);
                     }
@@ -184,101 +244,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         writer.close();
     }
 
-    @Override
-    public List<String> searchForWords(String word) throws FileNotFoundException, IOException {
-        // Search for the word in the barrel
-        List<String> lines = new ArrayList<String>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(INDEXFILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        }
-        String words[] = word.split(" ");
-        HashMap<String, Integer> map = new HashMap<String, Integer>();
-        for (String palavra : words) {
-            for (String linha : lines) {
-                String[] parts = linha.split(";");
-                String wordInBarrel = parts[0];
-                List<String> links = Arrays.asList(parts).subList(1, parts.length);
-                if (wordInBarrel.toLowerCase().equals(palavra.toLowerCase())) {
-                    for (String link : links) {
-                        if (map.containsKey(link)) {
-                            map.put(link, map.get(link) + 1);
-                        } else {
-                            map.put(link, 1);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Remove links from the map that don't have all the words
-        for (String key : map.keySet()) {
-            if (map.get(key) != words.length) {
-                map.remove(key);
-            }
-        }
-
-        // Each string has the format "url;title;context"
-        List<String> result = new ArrayList<String>();
-        for (String key : map.keySet()) {
-            String aux = "";
-            try (BufferedReader reader2 = new BufferedReader(new FileReader(LINKSFILE))) {
-                String line2;
-                while ((line2 = reader2.readLine()) != null) {
-                    String[] parts = line2.split(";");
-                    String url = parts[0].split("\\|")[0];
-
-                    String title = parts[1];
-                    String context = parts[2];
-                    if (url.equals(key)) {
-                        aux = url + ";" + title + ";" + context;
-                    }
-                }
-            }
-            result.add(aux);
-        }
-
-        List<String> links_lines = new ArrayList<String>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                links_lines.add(line);
-            }
-        }
-
-        // Count the number of times each link appears in the barrel
-        // and sort the list by the number of times the link appears
-        Collections.sort(result, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                String[] parts1 = o1.split(";");
-                String[] parts2 = o2.split(";");
-                int count1 = 0;
-                int count2 = 0;
-                for (String linha : links_lines) {
-                    // count the number of times parts1 and parts2 appear in the barrel
-                    String[] parts = linha.split(";");
-                    String[] links = parts[0].split("\\|");
-                    for (String link : links) {
-                        if (link.equals(parts1[0])) {
-                            count1++;
-                        }
-                        if (link.equals(parts2[0])) {
-                            count2++;
-                        }
-                    }
-                }
-                return count2 - count1;
-            }
-        });
-
-        return result;
-    }
-
     // Find every link that points to a page
-    @Override
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException {
         List<String> lines = new ArrayList<String>();
         try (BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE))) {
@@ -326,4 +292,97 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         socket.close();
     }
 
+    @Override
+    public List<String> searchForWords(String word) throws FileNotFoundException, IOException {
+        System.out.println("Searching for " + word);
+        String words[] = word.split(" ");
+        auxMap.clear();
+
+        for (String palavra : words) {
+            palavra = palavra.toLowerCase();
+            if (indexMap.containsKey(palavra)) {
+                ArrayList<String> urls = indexMap.get(palavra);
+                for (String url : urls) {
+                    if (auxMap.containsKey(url)) {
+                        auxMap.put(url, auxMap.get(url) + 1);
+                    } else {
+                        auxMap.put(url, 1);
+                    }
+                }
+            }
+        }
+
+        for (String key : auxMap.keySet()) {
+            System.out.println(key + " " + auxMap.get(key));
+        }
+
+        // Remove links from the map that don't have all the words
+        Iterator<String> iterator = auxMap.keySet().iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            if (auxMap.get(key) != words.length) {
+                iterator.remove();
+            }
+        }
+        for (String key : auxMap.keySet()) {
+            System.out.println(key + " " + auxMap.get(key));
+        }
+
+
+        // Each string has the format "url;title;context"
+        ArrayList<String> results = new ArrayList<String>();
+        for (String key : auxMap.keySet()) {
+            ArrayList<String> info = linksMap.get(key);
+            String result = key + ";" + info.get(0) + ";" + info.get(1);
+            results.add(result);
+        }
+
+
+        // Count the number of times each url is referenced in the keys of linksMap
+        Collections.sort(results, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                String[] parts1 = o1.split(";");
+                String[] parts2 = o2.split(";");
+                String url1 = parts1[0];
+                String url2 = parts2[0];
+                int count1 = 0;
+                int count2 = 0;
+                for (String key : linksMap.keySet()) {
+                    ArrayList<String> urls = linksMap.get(key);
+                    if (urls.contains(url1)) {
+                        count1++;
+                    }
+                    if (urls.contains(url2)) {
+                        count2++;
+                    }
+                }
+                return count2 - count1;
+            }
+        });
+
+        for (String result : results) {
+            System.out.println(result);
+        }
+        return results;
+    }
+
+}
+
+class BarrelHashMaps {
+    private HashMap<String, ArrayList<String>> indexMap;
+    private HashMap<String, ArrayList<String>> linksMap;
+
+    public BarrelHashMaps(HashMap<String, ArrayList<String>> indexMap, HashMap<String, ArrayList<String>> linksMap) {
+        this.indexMap = indexMap;
+        this.linksMap = linksMap;
+    }
+
+    public HashMap<String, ArrayList<String>> getIndexMap() {
+        return indexMap;
+    }
+
+    public HashMap<String, ArrayList<String>> getLinksMap() {
+        return linksMap;
+    }
 }

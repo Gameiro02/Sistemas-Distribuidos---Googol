@@ -54,7 +54,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             // System.out.println("Downloader " + i + " is ready.");
         }
 
-        AdminPage adminPage = new AdminPage();
-        adminPage.showMenu();
+        // AdminPage adminPage = new AdminPage();
+        // adminPage.showMenu();
     }
 }
