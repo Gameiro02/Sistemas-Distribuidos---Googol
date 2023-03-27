@@ -1,5 +1,7 @@
 package src;
 
+import java.util.HashMap;
+
 public class Configuration {
     public static final String login = "tintin";
     public static final String password = "unicorn";

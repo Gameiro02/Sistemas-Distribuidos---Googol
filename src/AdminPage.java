@@ -2,7 +2,6 @@ package src;
 
 import java.util.ArrayList;
 import java.net.*;
-
 import java.io.IOException;
 
 public class AdminPage {
@@ -12,14 +11,12 @@ public class AdminPage {
 
     private ArrayList<String> downloaders;
     private ArrayList<String> barrels;
-    private ArrayList<String> mostFrequentSearches;
 
     private String stringMenu;
 
     public AdminPage() {
         this.downloaders = new ArrayList<String>();
         this.barrels = new ArrayList<String>();
-        this.mostFrequentSearches = new ArrayList<String>();
     }
 
     public void showMenu() {
@@ -49,11 +46,7 @@ public class AdminPage {
                 // System.out.println("Received: " + msg);
                 update(msg);
 
-                // If the new string is different from the old one, update the panel
-                if (!stringMenu.equals(generatePanelString())) {
-                    stringMenu = generatePanelString();
-                    System.out.println(stringMenu);
-                }
+                stringMenu = generatePanelString();
             }
 
         } catch (IOException e) {
@@ -75,12 +68,17 @@ public class AdminPage {
                 this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, msg_split[3] + ":" + msg_split[4]);
             } else if (msg_split[2].equals("Waiting")) {
                 this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, "Waiting");
+            } else if (msg_split[2].equals("Offline")) {
+                this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, "Offline");
             }
         } else if (msg_split[0].equals("BARREL")) {
             if (msg_split[2].equals("Active")) {
-                this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Active");
+                this.barrels.set(Integer.parseInt(msg_split[1]) - 1,
+                        "Active" + ":" + msg_split[3] + ":" + msg_split[4]);
             } else if (msg_split[2].equals("Waiting")) {
                 this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Waiting");
+            } else if (msg_split[2].equals("Offline")) {
+                this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Offline");
             }
         }
     }
@@ -98,8 +96,20 @@ public class AdminPage {
         }
 
         sb.append("\n------- Most Frequent Searches -------\n");
-        for (int i = 0; i < 10; i++) {
-            sb.append("Search[" + i + "] " + this.mostFrequentSearches.get(i) + "\n");
+        if (Configuration.searchDictionary.isEmpty()) {
+            for (int i = 0; i < 10; i++)
+                sb.append("Search[" + i + "] None\n");
+        } else {
+
+            for (int i = 0; i < 10; i++) {
+                if (Configuration.searchDictionary.containsKey(Configuration.searchDictionary.keySet().toArray()[i])) {
+                    sb.append("Search[" + i + "] " + Configuration.searchDictionary.keySet().toArray()[i] + " - "
+                            + Configuration.searchDictionary.get(Configuration.searchDictionary.keySet().toArray()[i])
+                            + "\n");
+                } else {
+                    sb.append("Search[" + i + "] None\n");
+                }
+            }
         }
 
         return sb.toString();
@@ -113,9 +123,10 @@ public class AdminPage {
         for (int i = 0; i < Configuration.NUM_BARRELS; i++) {
             this.barrels.add("Waiting");
         }
-        for (int i = 0; i < 10; i++) {
-            this.mostFrequentSearches.add("None");
-        }
+    }
+
+    public String getStringMenu() {
+        return this.stringMenu;
     }
 
 }
