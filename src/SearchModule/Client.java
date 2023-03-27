@@ -11,14 +11,14 @@ public class Client {
         SearchModuleInterface searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
         // List<String> result = searchModule.searchForWords("Hey ola");
         // if (result.size() == 0) {
-        //     System.out.println("No results found");
+        // System.out.println("No results found");
         // } else {
-        //     for (String s : result) {
-        //         String[] fields = s.split(";");
-        //         System.out.println("Link: " + fields[0]);
-        //         System.out.println("Title: " + fields[1]);
-        //         System.out.println("Context: " + fields[2]);
-        //     }
+        // for (String s : result) {
+        // String[] fields = s.split(";");
+        // System.out.println("Link: " + fields[0]);
+        // System.out.println("Title: " + fields[1]);
+        // System.out.println("Context: " + fields[2]);
+        // }
         // }
 
         List<String> result = searchModule.linksToAPage("http://127.0.0.1:5500/Tests/Test_Site2.html");

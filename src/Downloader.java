@@ -64,6 +64,7 @@ public class Downloader extends Thread {
                 e.printStackTrace();
                 try {
                     sendStatus("Offline");
+                    return;
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }

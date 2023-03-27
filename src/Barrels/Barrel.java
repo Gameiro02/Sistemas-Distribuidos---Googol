@@ -88,6 +88,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             e.printStackTrace();
             try {
                 sendStatus("Offline");
+                return;
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
