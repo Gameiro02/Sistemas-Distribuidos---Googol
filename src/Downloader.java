@@ -61,11 +61,11 @@ public class Downloader extends Thread {
                 sendLinkToQueue();
                 clear(); // Clear the variables
 
-                if (this.ID == 1) {
-                    // This is to test the program
-                    throw new Exception();
-                }
+                clear();
 
+                // if (this.ID == 1) {
+                // throw new Exception();
+                // }
             } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] stopped working!");
                 e.printStackTrace();
@@ -104,14 +104,42 @@ public class Downloader extends Thread {
     }
 
     private void sendWords() throws Exception {
-        String referencedUrls = "";
-        int numLinks = Configuration.MAXIMUM_REFERENCE_LINKS;
+
+        // Protocol :
+        // type | url; item_count | number; url | www.example.com; referenced_urls |
+        // url1 url2 url3; title | title; words | word1 word2 word3
+
+        // TODO: Only allow to send a maximum of 10 links
+
+        String referencedUrls = "type | url; item_count | " + this.links.size() + "; url | " + this.url
+                + "; referenced_urls | ";
+
+        if (this.links.size() == 0)
+            referencedUrls += "None; ";
+
         for (String link : this.links) {
-            referencedUrls += link + "|";
-            if (--numLinks == 0)
-                break;
+            // if its the last link, dont add a space
+            if (link == this.links.toArray()[this.links.size() - 1])
+                referencedUrls += link + "; ";
+            else
+                referencedUrls += link + " ";
         }
-        this.data = this.url + "|" + referencedUrls + ";" + this.title + ";" + this.words;
+
+        if (this.title == null)
+            this.title = "None; ";
+
+        if (this.words == null)
+            this.words = "None";
+
+        // replace ; with a space in words
+        this.words = this.words.replace(";", " ");
+
+        referencedUrls += "title | " + this.title + "; " + "words | " + this.words;
+
+        this.data = referencedUrls;
+
+        // System.out.println("Downloader[" + this.ID + "] " + "sending data: " +
+        // this.data);
 
         byte[] buffer = this.data.getBytes();
 
@@ -174,30 +202,18 @@ public class Downloader extends Thread {
             InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
             MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
 
-            // if its active send the url and the ip and port
-            // if its waiting send the ip and port
-
-            String statusString = "DOWNLOADER;" + this.ID + ";";
-
-            if (status == "Active") {
-                statusString += "Active;" + this.url + ";" + Configuration.PORT_A;
-            } else if (status == "Waiting") {
-                statusString += "Waiting;";
-            } else if (status == "Offline") {
-                statusString += "Offline";
-            } else {
-                System.out.println("Invalid status");
-                socket.close();
-                return;
-            }
+            // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
+            String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; ip | "
+                    + InetAddress.getLocalHost().getHostAddress() + "; port | " + Configuration.PORT_A;
 
             byte[] buffer = statusString.getBytes();
+
+            // System.out.println(statusString);
 
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group,
                     Configuration.MULTICAST_PORT_ADMIN);
             socket.send(packet);
             socket.close();
-
         } catch (Exception e) {
             System.err.println("Downloader[" + this.ID + "] failed to send status to admin");
         }

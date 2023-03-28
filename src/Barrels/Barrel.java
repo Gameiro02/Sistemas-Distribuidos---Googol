@@ -106,15 +106,78 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     private ArrayList<String> textParser(String received) {
-        String[] fields = received.split(";");
+
+        // Protocol :
+        // type | url; item_count | number; url | www.example.com; referenced_urls |
+        // url1 url2 url3; title | title; words | word1 word2 word3
+
         ArrayList<String> data = new ArrayList<String>();
 
-        data.add(fields[0]); // urls "url|referencedUrl1|referencedUrl2|..."
-        data.add(fields[1]); // title
+        // String[] fields = received.split(";");
 
-        for (int i = 2; i < fields.length; i++) {
-            data.add(fields[i]);
+        // data.add(fields[0]); // urls "url|referencedUrl1|referencedUrl2|..."
+        // data.add(fields[1]); // title
+
+        // for (int i = 2; i < fields.length; i++) {
+        // data.add(fields[i]);
+        // }
+
+        // Print the received text
+        System.out.println("Received: " + received);
+
+        String[] fields = received.split(";");
+
+        // Print the fields
+        for (int i = 0; i < fields.length; i++) {
+            System.out.println("fields[" + i + "] = " + fields[i]);
         }
+
+        // Get the type
+        String[] type = fields[0].split("\\|");
+
+        // Get the item count
+        String[] itemCount = fields[1].split("\\|");
+
+        // Get the url
+        String[] url = fields[2].split("\\|");
+
+        // Get the referenced urls
+        String referencedUrls = fields[3].split("\\|")[0];
+
+        String[] list_referenceUrl = referencedUrls.split(" ");
+
+        // Create a url: url|referencedUrl1|referencedUrl2|...
+        String urlAndReferencedUrls = url[1];
+        for (int i = 0; i < list_referenceUrl.length; i++) {
+            urlAndReferencedUrls += "|" + list_referenceUrl[i];
+        }
+
+        data.add(urlAndReferencedUrls);
+
+        // Get the title
+        String[] title = fields[4].split("\\|");
+        data.add(title[1]);
+
+        // Get the words
+        String[] words = fields[5].split("\\|");
+
+        // // Print the words
+        // for (int i = 0; i < words.length; i++) {
+        // System.out.println("words[" + i + "] = " + words[i]);
+        // }
+
+        // replace spaces with ";" except the first one
+        String wordsSeparatedBySemicolon = words[1].replace(" ", ";");
+
+        // add the first space back
+        wordsSeparatedBySemicolon = wordsSeparatedBySemicolon.replaceFirst(";", " ");
+
+        data.add(wordsSeparatedBySemicolon);
+
+        // print the data
+        // for (int i = 0; i < data.size(); i++) {
+        // System.out.println("data[" + i + "] = " + data.get(i));
+        // }
 
         return data;
     }
@@ -290,24 +353,12 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
 
-        // if its active send the url and the ip and port
-        // if its waiting send the ip and port
-
-        String statusString = "BARREL;" + this.index + ";";
-
-        if (status == "Active") {
-            statusString += "Active;" + Configuration.MULTICAST_ADDRESS + ";" + Configuration.MULTICAST_PORT + ";";
-        } else if (status == "Waiting") {
-            statusString += "Waiting;";
-        } else if (status == "Offline") {
-            statusString += "Offline";
-        } else {
-            System.out.println("Invalid status barrel");
-            socket.close();
-            return;
-        }
+        String statusString = "type | Barrel; index | " + this.index + "; status | " + status + "; ip | "
+                + Configuration.MULTICAST_ADDRESS + "; port | " + Configuration.MULTICAST_PORT + ";";
 
         byte[] buffer = statusString.getBytes();
+
+        // System.out.println(statusString);
 
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT_ADMIN);
         socket.send(packet);
