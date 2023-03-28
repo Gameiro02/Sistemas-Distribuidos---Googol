@@ -167,6 +167,11 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         String[] firstElement = data.get(0).split("\\|"); // url|referencedUrl1|referencedUrl2|...
         String url = firstElement[0];
+
+        if (lines.contains(url)) {
+            return;
+        }
+
         String otherUrls = "";
         for (int i = 1; i < firstElement.length; i++) {
             if (i != firstElement.length - 1)
@@ -275,7 +280,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     @Override
-    public List<String> searchForWords(String word) throws FileNotFoundException, IOException {
+    public List<String> searchForWords(String word, int pageNumber) throws FileNotFoundException, IOException {
         String words[] = word.split(" ");
         auxMap.clear();
 
@@ -302,9 +307,9 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         }
 
-        // Each string has the format "url;title;context"
         ArrayList<String> results = new ArrayList<String>();
-        for (String key : auxMap.keySet()) {
+        for (int i = (pageNumber - 1) * 10; i < pageNumber * 10 && i < auxMap.size(); i++) {
+            String key = (String) auxMap.keySet().toArray()[i];
             ArrayList<String> info = linksMap.get(key);
             String result = key + ";" + info.get(0) + ";" + info.get(1);
             results.add(result);
