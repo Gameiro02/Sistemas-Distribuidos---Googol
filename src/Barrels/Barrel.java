@@ -45,9 +45,19 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             f.createNewFile();
         }
 
+        if (Configuration.COLD_START) {
+            f.delete();
+            f.createNewFile();
+        }
+
         f = new File(LINKSFILE);
 
         if (!f.exists()) {
+            f.createNewFile();
+        }
+
+        if (Configuration.COLD_START) {
+            f.delete();
             f.createNewFile();
         }
 
@@ -110,6 +120,38 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     private void writeToHashMaps(ArrayList<String> data) {
+
+        synchronized (linksMap) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(";");
+                    String urlString = parts[0];
+
+                    if (parts.length != 3) {
+                        System.out.println("Barrel[" + this.index + "] [No description] failed to store in barrel");
+                        reader.close();
+                        return;
+                    }
+
+                    ArrayList<String> info = new ArrayList<>();
+                    info.add(parts[1]); // title
+                    info.add(parts[2]); // context
+
+                    String[] urlParts = urlString.split("\\|");
+                    for (int i = 1; i < urlParts.length; i++) {
+                        info.add(urlParts[i]);
+                    }
+
+                    linksMap.put(urlString.split("\\|")[0], info);
+                }
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         synchronized (indexMap) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(INDEXFILE));
@@ -122,31 +164,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                         urls.add(parts[i]);
                     }
                     indexMap.put(word, urls);
-                }
-                reader.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        synchronized (linksMap) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(";");
-                    String urlString = parts[0];
-
-                    ArrayList<String> info = new ArrayList<>();
-                    info.add(parts[1]); // title
-                    info.add(parts[2]); // context
-
-                    String[] urlParts = urlString.split("\\|");
-                    for (int i = 1; i < urlParts.length; i++) {
-                        info.add(urlParts[i]);
-                    }
-
-                    linksMap.put(urlString.split("\\|")[0], info);
                 }
                 reader.close();
             } catch (Exception e) {
@@ -200,6 +217,11 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 linha = url + ";" + data.get(1) + ";" + context;
             }
 
+            if (context == null || context.equals("")) {
+                System.out.println("Barrel[" + this.index + "] [No description] failed to store in barrel");
+                return;
+            }
+
             FileWriter writer = new FileWriter(LINKSFILE, true);
             writer.write(linha);
             writer.write(System.getProperty("line.separator"));
@@ -246,6 +268,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     // Find every link that points to a page
+    @Override
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException {
         // this.linksMap format: url -> [title, context, referencedUrl1, referencedUrl2,
         // ...]
@@ -296,6 +319,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         String words[] = word.split(" ");
         auxMap.clear();
 
+        // Gets the links that each words
         for (String palavra : words) {
             palavra = palavra.toLowerCase();
             if (indexMap.containsKey(palavra)) {
@@ -319,8 +343,9 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         }
 
+        // Create a list with the results
         ArrayList<String> results = new ArrayList<String>();
-        for (int i = (pageNumber - 1) * 10; i < pageNumber * 10 && i < auxMap.size(); i++) {
+        for (int i = 0; i < auxMap.size(); i++) {
             String key = (String) auxMap.keySet().toArray()[i];
             ArrayList<String> info = linksMap.get(key);
             String result = key + ";" + info.get(0) + ";" + info.get(1);
@@ -350,25 +375,14 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         });
 
+        // Return the results, 10 per page
+        int start = (pageNumber - 1) * 10;
+        int end = start + 10;
+        if (end > results.size()) {
+            end = results.size();
+        }
+        results = new ArrayList<String>(results.subList(start, end));
         return results;
     }
 
-}
-
-class BarrelHashMaps {
-    private HashMap<String, ArrayList<String>> indexMap;
-    private HashMap<String, ArrayList<String>> linksMap;
-
-    public BarrelHashMaps(HashMap<String, ArrayList<String>> indexMap, HashMap<String, ArrayList<String>> linksMap) {
-        this.indexMap = indexMap;
-        this.linksMap = linksMap;
-    }
-
-    public HashMap<String, ArrayList<String>> getIndexMap() {
-        return indexMap;
-    }
-
-    public HashMap<String, ArrayList<String>> getLinksMap() {
-        return linksMap;
-    }
 }

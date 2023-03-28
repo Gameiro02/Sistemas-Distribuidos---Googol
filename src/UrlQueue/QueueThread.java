@@ -47,7 +47,6 @@ public class QueueThread extends Thread {
             synchronized (urlQueue) {
                 urlQueue.addUrl(url);
             }
-            System.out.println("Received url: " + url);
         }
 
         socket.close();

@@ -22,6 +22,7 @@ public class UrlQueue {
         if (visited.contains(url))
             return;
 
+        System.out.println("Added url: " + url);
         queue.add(url);
         visited.add(url);
     }

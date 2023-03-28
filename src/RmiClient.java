@@ -21,13 +21,35 @@ public class RmiClient {
         boolean exit = false;
 
         while (true) {
-            int command = scanner.nextInt();
+            int command;
+            try {
+                command = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.err.println("Comando inválido");
+                System.out.print("Digite o comando desejado: ");
+                scanner.next();
+                continue;
+            }
             switch (command) {
                 case 1:
                     System.out.print("Insira o link da página: ");
                     scanner.nextLine();
                     String url = scanner.nextLine();
+                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                        System.out.println("Link inválido");
+                        System.out.println("Tem que começar com http:// ou https://");
+                        System.out.println(
+                                "====================================================================================");
+                        System.out.println("Digite 6 para exibir o menu novamente");
+                        System.out.print("Digite o comando desejado: ");
+                        break;
+                    }
                     searchModule.IndexarUmNovoUrl(url);
+                    System.out.println("Página enviada para a fila de indexação");
+                    System.out.println(
+                            "====================================================================================");
+                    System.out.println("Digite 6 para exibir o menu novamente");
+                    System.out.print("Digite o comando desejado: ");
                     break;
                 case 2:
                     searchWord(searchModule, scanner);
@@ -63,6 +85,7 @@ public class RmiClient {
                     break;
                 default:
                     System.out.println("Comando inválido");
+                    System.out.print("Digite o comando desejado: ");
                     break;
             }
             if (exit) {
@@ -137,8 +160,9 @@ public class RmiClient {
     private void checkLogin(SearchModuleInterface searchModule, Scanner scanner, int command)
             throws FileNotFoundException, IOException, NotBoundException {
         boolean justLogged = false;
-        if (!login && command == 3) {
-            System.out.println("Para utilizar esta função, é necessário estar logado");
+        if (!login) {
+            if (command == 3)
+                System.out.println("Para utilizar esta função, é necessário estar logado");
             System.out.print("Insira o nome de usuário: ");
             scanner.nextLine();
             String username = scanner.nextLine();
