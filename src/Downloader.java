@@ -57,9 +57,9 @@ public class Downloader extends Thread {
 
                 clear();
 
-                if (this.ID == 1) {
-                    throw new Exception();
-                }
+                // if (this.ID == 1) {
+                // throw new Exception();
+                // }
             } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] stopped working!");
                 try {
@@ -92,11 +92,40 @@ public class Downloader extends Thread {
     }
 
     private void sendWords() throws Exception {
-        String referencedUrls = "";
+
+        // Protocol :
+        // type | url; item_count | number; url | www.example.com; referenced_urls |
+        // url1 url2 url3; title | title; words | word1 word2 word3
+
+        String referencedUrls = "type | url; item_count | " + this.links.size() + "; url | " + this.url
+                + "; referenced_urls | ";
+
+        if (this.links.size() == 0)
+            referencedUrls += "None; ";
+
         for (String link : this.links) {
-            referencedUrls += link + "|";
+            // if its the last link, dont add a space
+            if (link == this.links.toArray()[this.links.size() - 1])
+                referencedUrls += link + "; ";
+            else
+                referencedUrls += link + " ";
         }
-        this.data = this.url + "|" + referencedUrls + ";" + this.title + ";" + this.words;
+
+        if (this.title == null)
+            this.title = "None; ";
+
+        if (this.words == null)
+            this.words = "None";
+
+        // replace ; with a space in words
+        this.words = this.words.replace(";", " ");
+
+        referencedUrls += "title | " + this.title + "; " + "words | " + this.words;
+
+        this.data = referencedUrls;
+
+        // System.out.println("Downloader[" + this.ID + "] " + "sending data: " +
+        // this.data);
 
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);

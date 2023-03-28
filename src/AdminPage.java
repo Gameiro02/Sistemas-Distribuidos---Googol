@@ -93,7 +93,7 @@ public class AdminPage {
 
             for (int i = 0; i < 10 && i < this.searchDictionary.size(); i++) {
                 if (this.searchDictionary.containsKey(this.searchDictionary.keySet().toArray()[i])) {
-                    sb.append("Search[" + i+1 + "] " + this.searchDictionary.keySet().toArray()[i] + " - "
+                    sb.append("Search[" + i + "] " + this.searchDictionary.keySet().toArray()[i] + " - "
                             + this.searchDictionary.get(this.searchDictionary.keySet().toArray()[i])
                             + "\n");
                 }
