@@ -1,5 +1,8 @@
 package src;
 
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.HashSet;
 
 import org.jsoup.Jsoup;
@@ -33,33 +36,24 @@ public class Downloader extends Thread {
             e.printStackTrace();
         }
         while (true) {
-            this.url = getUrl();
-            if (this.url == null) {
-                System.out.println("No more urls to download");
-                continue;
-            }
-            sendStatus("Active");
             try {
-                this.doc = Jsoup.connect(this.url).get();
-            } catch (Exception e) {
-                // This url doesn't need to be sent to the queue
-                // It failed to download, because it's not a valid url
-                System.err.println("Downloader[" + this.ID + "] [Not valid] failed to download url: " + this.url);
-            }
-
-            try {
-                download();
-
-                if (this.title == null) {
-                    // This url doesn't need to be sent to the queue
-                    // It doesn't have a title, so it's not a valid url
-                    System.err.println("Downloader[" + this.ID + "] failed to download url [No title]: " + this.url);
+                this.url = getUrl();
+                if (this.url == null) {
+                    System.out.println("No more urls to download");
                     continue;
                 }
 
+                sendStatus("Active");
+
+                // System.out.println("Downloader[" + this.ID + "] " + "downloading: " +
+                // this.url);
+                this.doc = Jsoup.connect(this.url).get();
+                download();
                 sendWords();
+
+                // System.out.println("Downloader[" + this.ID + "] " + "downloaded: " +
+                // this.url);
                 sendLinkToQueue();
-                clear(); // Clear the variables
 
                 clear();
 
@@ -68,7 +62,6 @@ public class Downloader extends Thread {
                 // }
             } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] stopped working!");
-                e.printStackTrace();
                 try {
                     sendStatus("Offline");
                     return;
@@ -81,12 +74,7 @@ public class Downloader extends Thread {
     }
 
     private void download() {
-        String title;
-        try {
-            title = doc.title();
-        } catch (NullPointerException e) {
-            return;
-        }
+        String title = doc.title();
         this.title = title;
 
         String[] words = doc.text().split(" ");
@@ -108,8 +96,6 @@ public class Downloader extends Thread {
         // Protocol :
         // type | url; item_count | number; url | www.example.com; referenced_urls |
         // url1 url2 url3; title | title; words | word1 word2 word3
-
-        // TODO: Only allow to send a maximum of 10 links
 
         String referencedUrls = "type | url; item_count | " + this.links.size() + "; url | " + this.url
                 + "; referenced_urls | ";
@@ -141,82 +127,52 @@ public class Downloader extends Thread {
         // System.out.println("Downloader[" + this.ID + "] " + "sending data: " +
         // this.data);
 
-        byte[] buffer = this.data.getBytes();
-
-        if (buffer.length > 65534) {
-            // This url doesn't need to be sent to the queue
-            // It's too big to be downloaded
-            System.err.println("Downloader[" + this.ID + "] [File too big] failed to send data to storage barrel");
-            return;
-        }
-
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
+        byte[] buffer = this.data.getBytes();
+
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT);
-        try {
-            socket.send(packet);
-        } catch (Exception e) {
-            System.err.println("Downloader[" + this.ID + "] failed to send data to storage barrel");
-            e.printStackTrace();
-        }
+        socket.send(packet);
         socket.close();
     }
 
-    private String getUrl() {
-        String url;
-        try {
-            Socket socket = new Socket("localhost", Configuration.PORT_A);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            url = in.readLine();
-            socket.close();
-        } catch (Exception e) {
-            System.err.println("Downloader[" + this.ID + "] failed to get url from queue");
-            e.printStackTrace();
-            return null;
-        }
+    private String getUrl() throws IOException {
+        Socket socket = new Socket("localhost", Configuration.PORT_A);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        String url = in.readLine();
+        socket.close();
 
         return url;
     }
 
-    private void sendLinkToQueue() {
-        try {
-            Socket socket = new Socket("localhost", Configuration.PORT_B);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    private void sendLinkToQueue() throws IOException {
+        Socket socket = new Socket("localhost", Configuration.PORT_B);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            for (String link : links) {
-                out.println(link);
-                // System.out.println("Downloader[" + this.ID + "] " + "sent url: " + link);
-            }
-
-            socket.close();
-        } catch (Exception e) {
-            // If this fails, the url needs to be sent to the queue again
-            System.err.println("[NEED TO HANDLE]Downloader[" + this.ID + "] failed to send url to queue");
-            // e.printStackTrace();
+        for (String link : links) {
+            out.println(link);
+            System.out.println("Downloader[" + this.ID + "] " + "sent url: " + link);
         }
+
+        socket.close();
     }
 
-    private void sendStatus(String status) {
-        try {
-            InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
-            MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
+    private void sendStatus(String status) throws IOException {
+        InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
+        MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
 
-            // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
-            String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; ip | "
-                    + InetAddress.getLocalHost().getHostAddress() + "; port | " + Configuration.PORT_A;
+        // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
+        String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; ip | "
+                + InetAddress.getLocalHost().getHostAddress() + "; port | " + Configuration.PORT_A;
 
-            byte[] buffer = statusString.getBytes();
+        byte[] buffer = statusString.getBytes();
 
-            // System.out.println(statusString);
+        // System.out.println(statusString);
 
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group,
-                    Configuration.MULTICAST_PORT_ADMIN);
-            socket.send(packet);
-            socket.close();
-        } catch (Exception e) {
-            System.err.println("Downloader[" + this.ID + "] failed to send status to admin");
-        }
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT_ADMIN);
+        socket.send(packet);
+        socket.close();
     }
 
     private void clear() {
