@@ -66,23 +66,22 @@ public class AdminPage {
 
         String[] msg_split = msg.split(";");
 
-        if (msg_split[0].equals("DOWNLOADER")) {
-            if (msg_split[2].equals("Active")) {
-                this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, msg_split[3] + ":" + msg_split[4]);
-            } else if (msg_split[2].equals("Waiting")) {
-                this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, "Waiting");
-            } else if (msg_split[2].equals("Offline")) {
-                this.downloaders.set(Integer.parseInt(msg_split[1]) - 1, "Offline");
-            }
-        } else if (msg_split[0].equals("BARREL")) {
-            if (msg_split[2].equals("Active")) {
-                this.barrels.set(Integer.parseInt(msg_split[1]) - 1,
-                        "Active" + ":" + msg_split[3] + ":" + msg_split[4]);
-            } else if (msg_split[2].equals("Waiting")) {
-                this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Waiting");
-            } else if (msg_split[2].equals("Offline")) {
-                this.barrels.set(Integer.parseInt(msg_split[1]) - 1, "Offline");
-            }
+        // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
+
+        if (msg_split[0].split("\\|")[1].trim().equals("Downloader")) {
+            int index = Integer.parseInt(msg_split[1].split("\\|")[1].trim());
+            String ip = msg_split[2].split("\\|")[1].trim();
+            String port = msg_split[3].split("\\|")[1].trim();
+            String status = msg_split[4].split("\\|")[1].trim();
+
+            this.downloaders.set(index - 1, ip + ":" + port + " - " + status);
+        } else if (msg_split[0].split("\\|")[1].trim().equals("Barrel")) {
+            int index = Integer.parseInt(msg_split[1].split("\\|")[1].trim());
+            String ip = msg_split[2].split("\\|")[1].trim();
+            String port = msg_split[3].split("\\|")[1].trim();
+            String status = msg_split[4].split("\\|")[1].trim();
+
+            this.barrels.set(index - 1, ip + ":" + port + " - " + status);
         }
     }
 

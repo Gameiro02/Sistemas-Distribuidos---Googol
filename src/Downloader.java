@@ -133,24 +133,13 @@ public class Downloader extends Thread {
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
 
-        // if its active send the url and the ip and port
-        // if its waiting send the ip and port
-
-        String statusString = "DOWNLOADER;" + this.ID + ";";
-
-        if (status == "Active") {
-            statusString += "Active;" + this.url + ";" + Configuration.PORT_A;
-        } else if (status == "Waiting") {
-            statusString += "Waiting;";
-        } else if (status == "Offline") {
-            statusString += "Offline";
-        } else {
-            System.out.println("Invalid status");
-            socket.close();
-            return;
-        }
+        // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
+        String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; ip | "
+                + InetAddress.getLocalHost().getHostAddress() + "; port | " + Configuration.PORT_A;
 
         byte[] buffer = statusString.getBytes();
+
+        // System.out.println(statusString);
 
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT_ADMIN);
         socket.send(packet);

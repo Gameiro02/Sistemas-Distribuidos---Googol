@@ -262,24 +262,12 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
 
-        // if its active send the url and the ip and port
-        // if its waiting send the ip and port
-
-        String statusString = "BARREL;" + this.index + ";";
-
-        if (status == "Active") {
-            statusString += "Active;" + Configuration.MULTICAST_ADDRESS + ";" + Configuration.MULTICAST_PORT + ";";
-        } else if (status == "Waiting") {
-            statusString += "Waiting;";
-        } else if (status == "Offline") {
-            statusString += "Offline";
-        } else {
-            System.out.println("Invalid status barrel");
-            socket.close();
-            return;
-        }
+        String statusString = "type | Barrel; index | " + this.index + "; status | " + status + "; ip | "
+                + Configuration.MULTICAST_ADDRESS + "; port | " + Configuration.MULTICAST_PORT + ";";
 
         byte[] buffer = statusString.getBytes();
+
+        // System.out.println(statusString);
 
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT_ADMIN);
         socket.send(packet);
