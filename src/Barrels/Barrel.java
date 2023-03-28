@@ -161,11 +161,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         // Get the words
         String[] words = fields[5].split("\\|");
 
-        // // Print the words
-        // for (int i = 0; i < words.length; i++) {
-        // System.out.println("words[" + i + "] = " + words[i]);
-        // }
-
         // replace spaces with ";" except the first one
         String wordsSeparatedBySemicolon = words[1].replace(" ", ";");
 
