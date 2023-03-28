@@ -16,16 +16,6 @@ import src.Barrels.Barrel;
 import src.Barrels.BarrelInterface;
 import src.AdminPage;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.util.HashSet;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import java.net.*;
 import java.io.*;
 

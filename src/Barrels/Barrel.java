@@ -113,66 +113,56 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         ArrayList<String> data = new ArrayList<String>();
 
-        // String[] fields = received.split(";");
+        // System.out.println("received: " + received);
 
-        // data.add(fields[0]); // urls "url|referencedUrl1|referencedUrl2|..."
-        // data.add(fields[1]); // title
-
-        // for (int i = 2; i < fields.length; i++) {
-        // data.add(fields[i]);
-        // }
-
-        // Print the received text
-        System.out.println("Received: " + received);
-
-        String[] fields = received.split(";");
-
-        // Print the fields
-        for (int i = 0; i < fields.length; i++) {
-            System.out.println("fields[" + i + "] = " + fields[i]);
-        }
-
-        // Get the type
-        String[] type = fields[0].split("\\|");
-
-        // Get the item count
-        String[] itemCount = fields[1].split("\\|");
+        String[] fields = received.split("; ");
 
         // Get the url
-        String[] url = fields[2].split("\\|");
+        String[] url = fields[2].split(" \\| ");
 
         // Get the referenced urls
-        String referencedUrls = fields[3].split("\\|")[0];
+        String referencedUrls = fields[3].split(" \\| ")[1];
 
         String[] list_referenceUrl = referencedUrls.split(" ");
 
         // Create a url: url|referencedUrl1|referencedUrl2|...
         String urlAndReferencedUrls = url[1];
         for (int i = 0; i < list_referenceUrl.length; i++) {
+            if (list_referenceUrl[i].equals("None")) {
+                // Remove the last "|" if there is no referenced urls
+                urlAndReferencedUrls = urlAndReferencedUrls.substring(0, urlAndReferencedUrls.length() - 1);
+                break;
+            }
+
             urlAndReferencedUrls += "|" + list_referenceUrl[i];
         }
 
         data.add(urlAndReferencedUrls);
 
         // Get the title
-        String[] title = fields[4].split("\\|");
-        data.add(title[1]);
+        try {
+            String[] title = fields[4].split(" \\| ");
+            data.add(title[1]);
+        } catch (Exception e) {
+            for (String field : fields) {
+                System.out.println("FIELD: " + field);
+            }
+            e.printStackTrace();
+        }
 
         // Get the words
-        String[] words = fields[5].split("\\|");
+        String[] words = fields[5].split(" \\| ");
 
         // replace spaces with ";" except the first one
         String wordsSeparatedBySemicolon = words[1].replace(" ", ";");
 
-        // add the first space back
-        wordsSeparatedBySemicolon = wordsSeparatedBySemicolon.replaceFirst(";", " ");
-
         data.add(wordsSeparatedBySemicolon);
 
-        // print the data
-        // for (int i = 0; i < data.size(); i++) {
-        // System.out.println("data[" + i + "] = " + data.get(i));
-        // }
+        
+        // Print data
+        // System.out.println("Barrel[" + this.index + "] [url] " + data.get(0));
+        // System.out.println("Barrel[" + this.index + "] [title] " + data.get(1));
+        // System.out.println("Barrel[" + this.index + "] [words] " + data.get(2));
 
         return data;
     }
@@ -248,7 +238,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
 
         String otherUrls = "";
-        for (int i = 1; i < firstElement.length; i++) {
+        for (int i = 2; i < firstElement.length; i++) {
             if (i != firstElement.length - 1)
                 otherUrls += firstElement[i] + "|";
             else
@@ -264,10 +254,12 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         if (!found) {
             int titleSize = data.get(1).split(" ").length;
+            String[] words = data.get(2).split(";");
             String context = "";
-            for (int i = 2 + titleSize; i < data.size() && i < Configuration.CONTEXT_SIZE + 2 + titleSize; i++) {
-                context += data.get(i) + " ";
+            for (int i = 2 + titleSize; i < words.length && i < Configuration.CONTEXT_SIZE + 2 + titleSize; i++) {
+                context += words[i] + " ";
             }
+
             String linha;
             if (!otherUrls.equals("")) {
                 linha = url + "|" + otherUrls + ";" + data.get(1) + ";" + context;
@@ -282,6 +274,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
             FileWriter writer = new FileWriter(LINKSFILE, true);
             writer.write(linha);
+            // System.out.println("Barrel[" + this.index + "] " + linha + " stored in barrel");
             writer.write(System.getProperty("line.separator"));
             writer.close();
         }
@@ -296,24 +289,34 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
         reader.close();
 
+        // System.out.println("==================================");
+        // for (String info : data) {
+        //     System.out.println("Field: " + info);
+        // }
+        // System.out.println("==================================");
+
         String[] firstElement = data.get(0).split("\\|"); // url|referencedUrl1|referencedUrl2|...
         String url = firstElement[0];
 
-        for (int i = 2; i < data.size(); i++) {
+        String[] words = data.get(2).split(";");
+
+        for (String word : words) {
             boolean found = false;
+
             for (String linha : lines) {
                 String[] parts = linha.split(";");
-                String word = parts[0].toLowerCase();
+                String wordInFile = parts[0].toLowerCase();
                 List<String> links = Arrays.asList(parts).subList(1, parts.length);
-                if (word.equals(data.get(i).toLowerCase())) {
+                if (wordInFile.equals(word.toLowerCase())) {
                     if (!links.contains(url)) {
                         lines.set(lines.indexOf(linha), linha + ";" + url);
                     }
                     found = true;
                 }
             }
+
             if (!found) {
-                lines.add(data.get(i) + ";" + url);
+                lines.add(word + ";" + url);
             }
         }
 
