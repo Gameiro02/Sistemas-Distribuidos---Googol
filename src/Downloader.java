@@ -227,9 +227,9 @@ public class Downloader extends Thread {
             InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
             MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
-            // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
-            String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; ip | "
-                    + InetAddress.getLocalHost().getHostAddress() + "; port | " + Configuration.PORT_A;
+            // Protocol : "type | Downloader; status | Active; url | www.example.com;
+            String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; url | "
+                    + this.url;
 
             byte[] buffer = statusString.getBytes();
 
