@@ -120,7 +120,7 @@ public class Downloader extends Thread {
         // Protocol :
         // type | url; item_count | number; url | www.example.com; referenced_urls |
         // url1 url2 url3; title | title; words | word1 word2 word3
-        
+
         String referencedUrls = "type | url; item_count | " + this.links.size() + "; url | " + this.url
                 + "; referenced_urls | ";
 
@@ -150,7 +150,6 @@ public class Downloader extends Thread {
 
         referencedUrls += "title | " + this.title + "; " + "words | " + this.words;
         this.data = referencedUrls;
-
 
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
@@ -205,9 +204,9 @@ public class Downloader extends Thread {
             InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
             MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
-            // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
-            String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; ip | "
-                    + InetAddress.getLocalHost().getHostAddress() + "; port | " + Configuration.PORT_A;
+            // Protocol : "type | Downloader; status | Active; url | www.example.com;
+            String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; url | "
+                    + this.url;
 
             byte[] buffer = statusString.getBytes();
 

@@ -54,15 +54,14 @@ public class AdminPage {
     private void update(String msg) {
         String[] msg_split = msg.split(";");
 
-        // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
+        // Protocol : "type | Downloader; status | Active; url | www.example.com;
 
         if (msg_split[0].split("\\|")[1].trim().equals("Downloader")) {
             int index = Integer.parseInt(msg_split[1].split("\\|")[1].trim());
-            String ip = msg_split[2].split("\\|")[1].trim();
-            String port = msg_split[3].split("\\|")[1].trim();
-            String status = msg_split[4].split("\\|")[1].trim();
+            String status = msg_split[2].split("\\|")[1].trim();
+            String url = msg_split[3].split("\\|")[1].trim();
 
-            this.downloaders.set(index - 1, ip + ":" + port + " - " + status);
+            this.downloaders.set(index - 1, status + " - " + url);
         } else if (msg_split[0].split("\\|")[1].trim().equals("Barrel")) {
             int index = Integer.parseInt(msg_split[1].split("\\|")[1].trim());
             String ip = msg_split[2].split("\\|")[1].trim();
@@ -92,7 +91,7 @@ public class AdminPage {
         } else {
 
             for (int i = 0; i < 10 && i < this.searchDictionary.size(); i++) {
-                int aux = i+1;
+                int aux = i + 1;
                 if (this.searchDictionary.containsKey(this.searchDictionary.keySet().toArray()[i])) {
                     sb.append("Search[" + aux + "]: " + this.searchDictionary.keySet().toArray()[i] + " - "
                             + this.searchDictionary.get(this.searchDictionary.keySet().toArray()[i])
