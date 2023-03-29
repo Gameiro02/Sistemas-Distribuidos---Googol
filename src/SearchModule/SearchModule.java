@@ -54,16 +54,19 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
     }
 
     private int gerarNumeroImparAleatorio(int n) {
-        Random random = new Random();
-        int numeroAleatorio = random.nextInt(n) + 1;
-        int numeroImparAleatorio = numeroAleatorio % 2 == 0 ? numeroAleatorio + 1 : numeroAleatorio;
+
+        int numeroImparAleatorio = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
+        while (numeroImparAleatorio % 2 == 0) {
+            numeroImparAleatorio = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
+        }
         return numeroImparAleatorio;
     }
 
     private int gerarNumeroPar(int n) {
-        Random random = new Random();
-        int numero = random.nextInt(n) + 1;
-        int numeroPar = numero % 2 == 0 ? numero : numero + 1;
+        int numeroPar = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
+        while (numeroPar % 2 == 1) {
+            numeroPar = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
+        }
         return numeroPar;
     }
 
@@ -91,14 +94,12 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             System.out.println("Barrel: " + randomBarrel);
 
             BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
-            // add to the result
             result_par = barrel.searchForWords(palavrasAteM, pageNumber);
         }
         if (palavrasDeNateZ != "") {
             int randomBarrel = gerarNumeroImparAleatorio(Configuration.NUM_BARRELS);
             System.out.println("Barrel: " + randomBarrel);
             BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
-            // add to the result
             result_impar = barrel.searchForWords(palavrasDeNateZ, pageNumber);
         }
 
