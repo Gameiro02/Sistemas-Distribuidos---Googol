@@ -55,7 +55,7 @@ public class Downloader extends Thread {
             try {
                 download();
 
-                if (this.title == null) {
+                if (this.title == null || this.title.equals("")) {
                     // This url doesn't need to be sent to the queue
                     // It doesn't have a title, so it's not a valid url
                     System.err.println("Downloader[" + this.ID + "] [No title] failed to download url: " + this.url);
