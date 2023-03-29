@@ -103,10 +103,21 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             result_impar = barrel.searchForWords(palavrasDeNateZ, pageNumber);
         }
 
-        // Join the results
         List<String> result = new ArrayList<String>();
-        result.addAll(result_par);
-        result.addAll(result_impar);
+
+        // Check if both lists are not empty
+        if (!result_par.isEmpty() && !result_impar.isEmpty()) {
+            // Join the results where both words are present
+            for (String s : result_par) {
+                if (result_impar.contains(s)) {
+                    result.add(s);
+                }
+            }
+        } else if (!result_par.isEmpty()) {
+            result = result_par;
+        } else if (!result_impar.isEmpty()) {
+            result = result_impar;
+        }
 
         if (this.searchDictionary.containsKey(word)) {
             this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);
