@@ -161,6 +161,9 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         // replace spaces with ";" except the first one
         String wordsSeparatedBySemicolon = words[1].replace(" ", ";");
 
+        // Remove pontuation from wordsSeparatedBySemicolon except for ;
+        wordsSeparatedBySemicolon = wordsSeparatedBySemicolon.replaceAll("[^a-zA-Z0-9\\p{L};]", "");
+
         data.add(wordsSeparatedBySemicolon);
 
         // Print data

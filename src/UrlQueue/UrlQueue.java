@@ -18,9 +18,11 @@ public class UrlQueue {
         visited.add("http://127.0.0.1:5500/Tests/Test_Site1.html");
     }
 
-    public void addUrl(String url) {
-        // if (visited.contains(url))
-        //     return;
+    public void addUrl(String url, boolean resend) {
+        if (!resend) {
+            if (visited.contains(url))
+                return;
+        }
 
         System.out.println("Added url: " + url);
         queue.add(url);

@@ -35,7 +35,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         String[] palavras = frase.split(" ");
         String palavrasAteM = "";
         for (String palavra : palavras) {
-            if (palavra.toLowerCase().charAt(0) <= 'm') {
+            if (palavra.toLowerCase().charAt(0) < 'm') {
                 palavrasAteM += palavra + " ";
             }
         }
@@ -46,7 +46,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         String[] palavras = frase.split(" ");
         String palavrasDeNateZ = "";
         for (String palavra : palavras) {
-            if (palavra.toLowerCase().charAt(0) > 'm') {
+            if (palavra.toLowerCase().charAt(0) >= 'm') {
                 palavrasDeNateZ += palavra + " ";
             }
         }

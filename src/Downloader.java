@@ -88,7 +88,7 @@ public class Downloader extends Thread {
                 }
 
                 sendWords();
-                sendLinkToQueue();
+                sendLinkToQueue(false);
 
             } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] stopped working!");
@@ -97,7 +97,7 @@ public class Downloader extends Thread {
                 try {
                     this.links.clear();
                     this.links.add(this.url);
-                    sendLinkToQueue();
+                    sendLinkToQueue(true);
                 } catch (Exception e1) {
                     System.err.println("Downloader[" + this.ID + "] failed to send url to queue");
                 }
@@ -201,7 +201,8 @@ public class Downloader extends Thread {
                 url = in.readLine();
                 socket.close();
             } catch (Exception e) {
-                System.err.println("Downloader[" + this.ID + "] " + "failed to get url from queue, trying again in 3 seconds");
+                System.err.println(
+                        "Downloader[" + this.ID + "] " + "failed to get url from queue, trying again in 3 seconds");
                 Thread.sleep(3000); // Wait 3 second before trying again
             }
         }
@@ -209,7 +210,7 @@ public class Downloader extends Thread {
         return url;
     }
 
-    private void sendLinkToQueue() throws IOException, InterruptedException {
+    private void sendLinkToQueue(boolean resend) throws IOException, InterruptedException {
 
         int numberTries = 0;
         boolean success = false;
@@ -218,8 +219,15 @@ public class Downloader extends Thread {
                 Socket socket = new Socket("localhost", Configuration.PORT_B);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                for (String link : links) {
-                    out.println(link);
+                if (resend) {
+                    for (String link : links) {
+                        link = "[RESEND]" + link;
+                        out.println(link);
+                    }
+                } else {
+                    for (String link : links) {
+                        out.println(link);
+                    }
                 }
 
                 socket.close();
@@ -228,7 +236,8 @@ public class Downloader extends Thread {
                 // If this fails, the url needs to be sent to the queue again
                 numberTries++;
                 System.err.println(
-                        "Downloader[" + this.ID + "] [Attempts: " + numberTries + "] " + "failed to send url to queue, trying again in 3 seconds");
+                        "Downloader[" + this.ID + "] [Attempts: " + numberTries + "] "
+                                + "failed to send url to queue, trying again in 3 seconds");
                 Thread.sleep(3000);
             }
         }
