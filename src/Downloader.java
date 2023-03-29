@@ -201,8 +201,8 @@ public class Downloader extends Thread {
                 url = in.readLine();
                 socket.close();
             } catch (Exception e) {
-                System.err.println("Downloader[" + this.ID + "] " + "failed to get url from queue");
-                Thread.sleep(1000); // Wait 1 second before trying again
+                System.err.println("Downloader[" + this.ID + "] " + "failed to get url from queue, trying again in 3 seconds");
+                Thread.sleep(3000); // Wait 3 second before trying again
             }
         }
 
@@ -228,8 +228,8 @@ public class Downloader extends Thread {
                 // If this fails, the url needs to be sent to the queue again
                 numberTries++;
                 System.err.println(
-                        "Downloader[" + this.ID + "] [Attempts: " + numberTries + "] " + "failed to send url to queue");
-                Thread.sleep(1000);
+                        "Downloader[" + this.ID + "] [Attempts: " + numberTries + "] " + "failed to send url to queue, trying again in 3 seconds");
+                Thread.sleep(3000);
             }
         }
     }
