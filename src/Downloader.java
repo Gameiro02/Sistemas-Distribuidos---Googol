@@ -30,13 +30,21 @@ public class Downloader extends Thread {
     }
 
     public void run() throws RuntimeException {
+
         try {
             sendStatus("Waiting");
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         while (true) {
-            this.url = getUrl();
+
+            try {
+                this.url = getUrl();
+            } catch (InterruptedException e) {
+                System.err.println("Downloader[" + this.ID + "] [ON WHILE TRUE] failed to get url from queue");
+            }
+
             if (this.url == null) {
                 System.out.println("No more urls to download");
                 continue;
@@ -65,15 +73,20 @@ public class Downloader extends Thread {
                 sendWords();
                 sendLinkToQueue();
 
-                // if (this.ID == 1) {
-                // throw new Exception();
-                // }
-
                 clear();
 
             } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] stopped working!");
-                e.printStackTrace();
+
+                // Send current link to queue
+                try {
+                    this.links.clear();
+                    this.links.add(this.url);
+                    sendLinkToQueue();
+                } catch (Exception e1) {
+                    System.err.println("Downloader[" + this.ID + "] failed to send url to queue");
+                }
+
                 try {
                     sendStatus("Offline");
                     return;
@@ -120,7 +133,7 @@ public class Downloader extends Thread {
         // Protocol :
         // type | url; item_count | number; url | www.example.com; referenced_urls |
         // url1 url2 url3; title | title; words | word1 word2 word3
-        
+
         String referencedUrls = "type | url; item_count | " + this.links.size() + "; url | " + this.url
                 + "; referenced_urls | ";
 
@@ -151,7 +164,6 @@ public class Downloader extends Thread {
         referencedUrls += "title | " + this.title + "; " + "words | " + this.words;
         this.data = referencedUrls;
 
-
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
@@ -168,35 +180,45 @@ public class Downloader extends Thread {
         socket.close();
     }
 
-    private String getUrl() {
-        String url;
-        try {
-            Socket socket = new Socket("localhost", Configuration.PORT_A);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            url = in.readLine();
-            socket.close();
-        } catch (Exception e) {
-            System.err.println("Downloader[" + this.ID + "] " + "failed to get url from queue");
-            e.printStackTrace();
-            return null;
+    private String getUrl() throws InterruptedException {
+        String url = null;
+        while (url == null) {
+            try {
+                Socket socket = new Socket("localhost", Configuration.PORT_A);
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                url = in.readLine();
+                socket.close();
+            } catch (Exception e) {
+                System.err.println("Downloader[" + this.ID + "] " + "failed to get url from queue");
+                Thread.sleep(1000); // Wait 1 second before trying again
+            }
         }
 
         return url;
     }
 
-    private void sendLinkToQueue() throws IOException {
-        try {
-            Socket socket = new Socket("localhost", Configuration.PORT_B);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    private void sendLinkToQueue() throws IOException, InterruptedException {
 
-            for (String link : links) {
-                out.println(link);
+        int numberTries = 0;
+        boolean success = false;
+        while (!success) {
+            try {
+                Socket socket = new Socket("localhost", Configuration.PORT_B);
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+                for (String link : links) {
+                    out.println(link);
+                }
+
+                socket.close();
+                success = true;
+            } catch (Exception e) {
+                // If this fails, the url needs to be sent to the queue again
+                numberTries++;
+                System.err.println(
+                        "Downloader[" + this.ID + "] [Attempts: " + numberTries + "] " + "failed to send url to queue");
+                Thread.sleep(1000);
             }
-
-            socket.close();
-        } catch (Exception e) {
-            // If this fails, the url needs to be sent to the queue again
-            System.err.println("[NEED TO HANDLE] Downloader[" + this.ID + "] " + "failed to send url to queue");
         }
     }
 
