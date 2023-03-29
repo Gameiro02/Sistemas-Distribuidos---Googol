@@ -93,7 +93,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 data = textParser(received);
                 if (data == null)
                     continue;
-                    
+
                 writeToFile(data);
                 writeToLinksFile(data);
                 writeToHashMaps(data);
@@ -115,7 +115,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         // url1 url2 url3; title | title; words | word1 word2 word3
 
         ArrayList<String> data = new ArrayList<String>();
-
 
         String[] fields = received.split("; ");
 
@@ -162,7 +161,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         data.add(wordsSeparatedBySemicolon);
 
-        
         // Print data
         // System.out.println("Barrel[" + this.index + "] [url] " + data.get(0));
         // System.out.println("Barrel[" + this.index + "] [title] " + data.get(1));
@@ -278,7 +276,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
             FileWriter writer = new FileWriter(LINKSFILE, true);
             writer.write(linha);
-            // System.out.println("Barrel[" + this.index + "] " + linha + " stored in barrel");
+            // System.out.println("Barrel[" + this.index + "] " + linha + " stored in
+            // barrel");
             writer.write(System.getProperty("line.separator"));
             writer.close();
         }
@@ -295,7 +294,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         // System.out.println("==================================");
         // for (String info : data) {
-        //     System.out.println("Field: " + info);
+        // System.out.println("Field: " + info);
         // }
         // System.out.println("==================================");
 
@@ -306,6 +305,14 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         for (String word : words) {
             boolean found = false;
+
+            if (this.index % 2 == 0) {
+                if (word.toLowerCase().charAt(0) >= 'm')
+                    continue;
+            } else {
+                if (word.toLowerCase().charAt(0) < 'm')
+                    continue;
+            }
 
             for (String linha : lines) {
                 String[] parts = linha.split(";");
@@ -437,5 +444,4 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         results = new ArrayList<String>(results.subList(start, end));
         return results;
     }
-
 }

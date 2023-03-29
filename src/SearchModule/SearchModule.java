@@ -31,12 +31,81 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         adminPage = new AdminPage(searchDictionary);
     }
 
+    private String separarPalavrasPorLetra(String frase) {
+        String[] palavras = frase.split(" ");
+        String palavrasAteM = "";
+        for (String palavra : palavras) {
+            if (palavra.toLowerCase().charAt(0) <= 'm') {
+                palavrasAteM += palavra + " ";
+            }
+        }
+        return palavrasAteM;
+    }
+
+    private String separarPalavrasPorLetra2(String frase) {
+        String[] palavras = frase.split(" ");
+        String palavrasDeNateZ = "";
+        for (String palavra : palavras) {
+            if (palavra.toLowerCase().charAt(0) > 'm') {
+                palavrasDeNateZ += palavra + " ";
+            }
+        }
+        return palavrasDeNateZ;
+    }
+
+    private int gerarNumeroImparAleatorio(int n) {
+        Random random = new Random();
+        int numeroAleatorio = random.nextInt(n) + 1;
+        int numeroImparAleatorio = numeroAleatorio % 2 == 0 ? numeroAleatorio + 1 : numeroAleatorio;
+        return numeroImparAleatorio;
+    }
+
+    private int gerarNumeroPar(int n) {
+        Random random = new Random();
+        int numero = random.nextInt(n) + 1;
+        int numeroPar = numero % 2 == 0 ? numero : numero + 1;
+        return numeroPar;
+    }
+
     @Override
-    public List<String> searchForWords(String word, int pageNumber) throws NotBoundException, FileNotFoundException, IOException {
-        int randomBarrel = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
-        
-        BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
-        List<String> result = barrel.searchForWords(word, pageNumber);
+    public List<String> searchForWords(String word, int pageNumber)
+            throws NotBoundException, FileNotFoundException, IOException {
+
+        // Oo barrels pares contem informação sobre as palavras que começam pelas letras
+        // [a-m] e os impares [n-z]
+        // É necessário verificar em qual dos dois barrels a palavra se encontra ou se
+        // se encontra em ambos
+
+        List<String> result_par = new ArrayList<String>();
+        List<String> result_impar = new ArrayList<String>();
+        String palavrasAteM = separarPalavrasPorLetra(word);
+        String palavrasDeNateZ = separarPalavrasPorLetra2(word);
+        System.out.println("Palavra: " + word);
+
+        System.out.println("Palavras ate M: " + palavrasAteM);
+        System.out.println("Palavras de N ate Z: " + palavrasDeNateZ);
+
+        if (palavrasAteM != "") {
+            int randomBarrel = gerarNumeroPar(Configuration.NUM_BARRELS);
+
+            System.out.println("Barrel: " + randomBarrel);
+
+            BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
+            // add to the result
+            result_par = barrel.searchForWords(palavrasAteM, pageNumber);
+        }
+        if (palavrasDeNateZ != "") {
+            int randomBarrel = gerarNumeroImparAleatorio(Configuration.NUM_BARRELS);
+            System.out.println("Barrel: " + randomBarrel);
+            BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
+            // add to the result
+            result_impar = barrel.searchForWords(palavrasDeNateZ, pageNumber);
+        }
+
+        // Join the results
+        List<String> result = new ArrayList<String>();
+        result.addAll(result_par);
+        result.addAll(result_impar);
 
         if (this.searchDictionary.containsKey(word)) {
             this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);

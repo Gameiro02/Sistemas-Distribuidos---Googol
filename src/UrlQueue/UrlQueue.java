@@ -9,13 +9,13 @@ import src.Configuration;
 public class UrlQueue {
 
     private Queue<String> queue;
-    private ArrayList <String> visited;
+    private ArrayList<String> visited;
 
     public UrlQueue() {
         queue = new LinkedList<String>();
         visited = new ArrayList<String>();
-        // queue.add("http://127.0.0.1:5500/Tests/Test_Site1.html");
-        // visited.add("http://127.0.0.1:5500/Tests/Test_Site1.html");
+        queue.add("http://127.0.0.1:5500/Tests/Test_Site1.html");
+        visited.add("http://127.0.0.1:5500/Tests/Test_Site1.html");
     }
 
     public void addUrl(String url) {
