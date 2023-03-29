@@ -141,8 +141,21 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
     @Override
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException, NotBoundException {
         int randomBarrel = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
-        BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
-        List<String> result = barrel.linksToAPage(word);
+        BarrelInterface barrel = null;
+        List<String> result = null;
+        boolean connected = false;
+
+        while (!connected) {
+            try {
+                barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
+                result = barrel.linksToAPage(word);
+                connected = true;
+            } catch (RemoteException e) {
+                // Try again with another barrel
+                randomBarrel = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
+            }
+        }
+
         return result;
     }
 
@@ -195,7 +208,6 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             out.writeObject(Configuration.PASSWORD);
             out.close();
             fileOut.close();
-            System.out.println("Successfully wrote login credentials to file " + Configuration.CREDENTIALS_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }

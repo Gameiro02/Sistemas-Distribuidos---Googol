@@ -15,7 +15,7 @@ public class Configuration {
     public static final int MULTICAST_PORT = 4321;
     public static final String MULTICAST_ADDRESS = "224.3.2.1";
 
-    public static final int NUM_DOWNLOADERS = 10;
+    public static final int NUM_DOWNLOADERS = 20;
     public static final int NUM_BARRELS = 2;
 
     public static final int CONTEXT_SIZE = 15;

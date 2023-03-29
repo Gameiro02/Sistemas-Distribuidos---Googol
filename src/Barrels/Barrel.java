@@ -342,8 +342,15 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     // Find every link that points to a page
     @Override
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException {
-        // this.linksMap format: url -> [title, context, referencedUrl1, referencedUrl2,
-        // ...]
+        // this.linksMap format: url -> [title, context, referencedUrl1, referencedUrl2,...]
+
+        // Randomly throws RemoteException to simulate a crash
+        int random = (int) (Math.random() * 2) + 1;
+        if (random == 1) {
+            System.out.println("Barrel[" + this.index + "] simulated a crash while searching for words");
+            throw new RemoteException();
+        }
+
         List<String> result = new ArrayList<String>();
 
         for (String url : this.linksMap.keySet()) {
@@ -376,6 +383,14 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
     @Override
     public List<String> searchForWords(String word, int pageNumber) throws FileNotFoundException, IOException {
+
+        // Randomly throws RemoteException to simulate a crash
+        int random = (int) (Math.random() * 2) + 1;
+        if (random == 1) {
+            System.out.println("Barrel[" + this.index + "] simulated a crash while searching for words");
+            throw new RemoteException();
+        }
+
         String words[] = word.split(" ");
         auxMap.clear();
 
