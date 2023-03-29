@@ -29,8 +29,8 @@ public class AdminPage {
         MulticastSocket socket = null;
 
         try {
-            socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
-            InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
+            socket = new MulticastSocket(Configuration.MULTICAST_PORT);
+            InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
             socket.joinGroup(group);
 
             while (true) {

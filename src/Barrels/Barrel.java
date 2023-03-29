@@ -91,6 +91,9 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
                 ArrayList<String> data;
                 data = textParser(received);
+                if (data == null)
+                    continue;
+                    
                 writeToFile(data);
                 writeToLinksFile(data);
                 writeToHashMaps(data);
@@ -113,14 +116,15 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         ArrayList<String> data = new ArrayList<String>();
 
-        // System.out.println("received: " + received);
 
         String[] fields = received.split("; ");
 
-        // Get the url
+        String type = fields[0].split(" \\| ")[1];
+        if (!type.equals("url"))
+            return null;
+
         String[] url = fields[2].split(" \\| ");
 
-        // Get the referenced urls
         String referencedUrls = fields[3].split(" \\| ")[1];
 
         String[] list_referenceUrl = referencedUrls.split(" ");
@@ -348,8 +352,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     private void sendStatus(String status) throws IOException {
-        InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
-        MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
+        InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
+        MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
         String statusString = "type | Barrel; index | " + this.index + "; status | " + status + "; ip | "
                 + Configuration.MULTICAST_ADDRESS + "; port | " + Configuration.MULTICAST_PORT + ";";
@@ -358,7 +362,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
         // System.out.println(statusString);
 
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT_ADMIN);
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, Configuration.MULTICAST_PORT);
         socket.send(packet);
         socket.close();
     }

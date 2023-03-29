@@ -120,8 +120,6 @@ public class Downloader extends Thread {
         // Protocol :
         // type | url; item_count | number; url | www.example.com; referenced_urls |
         // url1 url2 url3; title | title; words | word1 word2 word3
-
-        // TODO: Only allow to send 10 links
         
         String referencedUrls = "type | url; item_count | " + this.links.size() + "; url | " + this.url
                 + "; referenced_urls | ";
@@ -204,8 +202,8 @@ public class Downloader extends Thread {
 
     private void sendStatus(String status) {
         try {
-            InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS_ADMIN);
-            MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT_ADMIN);
+            InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
+            MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
             // Protocol : "type | Downloader; index | 1; ip | 192.168.1.1; port | 1234"
             String statusString = "type | Downloader; index | " + this.ID + "; status | " + status + "; ip | "
@@ -216,7 +214,7 @@ public class Downloader extends Thread {
             // System.out.println(statusString);
 
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group,
-                    Configuration.MULTICAST_PORT_ADMIN);
+                    Configuration.MULTICAST_PORT);
             socket.send(packet);
             socket.close();
         } catch (Exception e) {

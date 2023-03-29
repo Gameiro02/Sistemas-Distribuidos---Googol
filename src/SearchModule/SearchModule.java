@@ -34,6 +34,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
     @Override
     public List<String> searchForWords(String word, int pageNumber) throws NotBoundException, FileNotFoundException, IOException {
         int randomBarrel = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
+        
         BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
         List<String> result = barrel.searchForWords(word, pageNumber);
 
