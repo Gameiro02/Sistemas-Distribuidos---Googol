@@ -5,6 +5,8 @@ public class Configuration {
 
     public boolean DEBUG = true;
     public static boolean COLD_START = true;
+    public static boolean AUTO_FAIL_BARRELS = true;
+    public static boolean AUTO_FAIL_DOWNLOADERS = false;
 
     // TCP ports
     public static final int PORT_A = 8080;

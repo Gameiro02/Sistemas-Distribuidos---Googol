@@ -39,6 +39,8 @@ public class Downloader extends Thread {
 
         while (true) {
 
+            clear();
+
             try {
                 this.url = getUrl();
             } catch (InterruptedException e) {
@@ -54,13 +56,28 @@ public class Downloader extends Thread {
 
             try {
                 this.doc = Jsoup.connect(this.url).get();
-            } catch (Exception e) {
+
                 // This url doesn't need to be sent to the queue
                 // It failed to download, because it is not a valid url
+            } catch (ConnectException e) {
+                System.out.println(
+                        "Downloader[" + this.ID + "] [Connection failed] failed to connect to url: " + this.url);
+                continue;
+            } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] [Not valid] failed to download url: " + this.url);
+                continue;
             }
 
             try {
+
+                if (Configuration.AUTO_FAIL_DOWNLOADERS) {
+                    int random = (int) (Math.random() * 5) + 1;
+                    if (this.ID == random) {
+                        System.out.println("Downloader[" + this.ID + "] Simulated a crash");
+                        throw new Exception();
+                    }
+                }
+
                 download();
 
                 if (this.title == null || this.title.equals("")) {
@@ -72,8 +89,6 @@ public class Downloader extends Thread {
 
                 sendWords();
                 sendLinkToQueue();
-
-                clear();
 
             } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] stopped working!");

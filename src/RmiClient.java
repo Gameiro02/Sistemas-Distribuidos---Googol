@@ -200,12 +200,28 @@ public class RmiClient {
     }
 
     public static void main(String[] args) throws Exception {
-        SearchModuleInterface searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
+        boolean connected = false;
+        SearchModuleInterface searchModule = null;
+        while (!connected) {
+            try {
+                searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
+                connected = true;
+            } catch (Exception e) {
+                System.out.println("Erro ao conectar com o servidor, tentando novamente em 3 segundos");
+                Thread.sleep(3000);
+            }
+        }
 
         RmiClient client = new RmiClient();
         client.login = false;
 
-        client.run(searchModule);
+        try {
+            client.run(searchModule);
+        } catch (Exception e) {
+            System.out.println("Erro ao conectar com o servidor, tentando novamente em 3 segundos");
+            Thread.sleep(3000);
+            main(args);
+        }
 
     }
 

@@ -78,18 +78,22 @@ public class AdminPage {
         StringBuilder sb = new StringBuilder();
         sb.append("------- Downloaders -------\n");
         for (int i = 0; i < Configuration.NUM_DOWNLOADERS; i++) {
-            sb.append("Downloader[" + i + "] " + this.downloaders.get(i) + "\n");
+            int aux = i + 1;
+            sb.append("Downloader[" + aux + "] " + this.downloaders.get(i) + "\n");
         }
 
         sb.append("\n------- Barrels -------\n");
         for (int i = 0; i < Configuration.NUM_BARRELS; i++) {
-            sb.append("Barrel[" + i + "] " + this.barrels.get(i) + "\n");
+            int aux = i + 1;
+            sb.append("Barrel[" + aux + "] " + this.barrels.get(i) + "\n");
         }
 
         sb.append("\n------- Most Frequent Searches -------\n");
         if (this.searchDictionary.isEmpty()) {
-            for (int i = 0; i < 10; i++)
-                sb.append("Search[" + i + "] None\n");
+            for (int i = 0; i < 10; i++) {
+                int aux = i + 1;
+                sb.append("Search[" + aux + "] None\n");
+            }
         } else {
 
             for (int i = 0; i < 10 && i < this.searchDictionary.size(); i++) {

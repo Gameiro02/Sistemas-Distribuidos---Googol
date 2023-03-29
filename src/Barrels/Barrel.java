@@ -82,7 +82,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             socket.joinGroup(group);
 
             while (true) {
-                byte[] buffer = new byte[16384];
+                byte[] buffer = new byte[65533];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
 
@@ -132,8 +132,10 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         String urlAndReferencedUrls = url[1];
         for (int i = 0; i < list_referenceUrl.length; i++) {
             if (list_referenceUrl[i].equals("None")) {
-                // Remove the last "|" if there is no referenced urls
-                urlAndReferencedUrls = urlAndReferencedUrls.substring(0, urlAndReferencedUrls.length() - 1);
+                // If the last character is a "|", remove it
+                if (urlAndReferencedUrls.charAt(urlAndReferencedUrls.length() - 1) == '|') {
+                    urlAndReferencedUrls = urlAndReferencedUrls.substring(0, urlAndReferencedUrls.length() - 1);
+                }
                 break;
             }
 
@@ -224,20 +226,20 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
 
     private void writeToLinksFile(ArrayList<String> data) throws IOException {
 
+        String[] firstElement = data.get(0).split("\\|"); // url|referencedUrl1|referencedUrl2|...
+        String url = firstElement[0];
+
         List<String> lines = new ArrayList<String>();
         BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE));
         String line;
         while ((line = reader.readLine()) != null) {
             lines.add(line);
+            if (line.split(";")[0].equals(url)) {
+                reader.close();
+                return;
+            }
         }
         reader.close();
-
-        String[] firstElement = data.get(0).split("\\|"); // url|referencedUrl1|referencedUrl2|...
-        String url = firstElement[0];
-
-        if (lines.contains(url)) {
-            return;
-        }
 
         String otherUrls = "";
         for (int i = 2; i < firstElement.length; i++) {
@@ -306,6 +308,10 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         for (String word : words) {
             boolean found = false;
 
+            if (word == null || word.equals("")) {
+                continue;
+            }
+
             if (this.index % 2 == 0) {
                 if (word.toLowerCase().charAt(0) >= 'm')
                     continue;
@@ -342,13 +348,16 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     // Find every link that points to a page
     @Override
     public List<String> linksToAPage(String word) throws FileNotFoundException, IOException {
-        // this.linksMap format: url -> [title, context, referencedUrl1, referencedUrl2,...]
+        // this.linksMap format: url -> [title, context, referencedUrl1,
+        // referencedUrl2,...]
 
         // Randomly throws RemoteException to simulate a crash
-        int random = (int) (Math.random() * 2) + 1;
-        if (random == 1) {
-            System.out.println("Barrel[" + this.index + "] simulated a crash while searching for words");
-            throw new RemoteException();
+        if (Configuration.AUTO_FAIL_BARRELS) {
+            int random = (int) (Math.random() * 2) + 1;
+            if (random == 1) {
+                System.out.println("Barrel[" + this.index + "] simulated a crash while searching for words");
+                throw new RemoteException();
+            }
         }
 
         List<String> result = new ArrayList<String>();
@@ -385,11 +394,13 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     public List<String> searchForWords(String word, int pageNumber) throws FileNotFoundException, IOException {
 
         // Randomly throws RemoteException to simulate a crash
-        int random = (int) (Math.random() * 2) + 1;
-        if (random == 1) {
-            System.out.println("Barrel[" + this.index + "] simulated a crash while searching for words");
-            throw new RemoteException();
-        }
+        if (Configuration.AUTO_FAIL_BARRELS) {
+            int random = (int) (Math.random() * 2) + 1;
+            if (random == 1) {
+                System.out.println("Barrel[" + this.index + "] simulated a crash while searching for words");
+                throw new RemoteException();
+            }
+        }  
 
         String words[] = word.split(" ");
         auxMap.clear();

@@ -19,8 +19,8 @@ public class UrlQueue {
     }
 
     public void addUrl(String url) {
-        if (visited.contains(url))
-            return;
+        // if (visited.contains(url))
+        //     return;
 
         System.out.println("Added url: " + url);
         queue.add(url);
