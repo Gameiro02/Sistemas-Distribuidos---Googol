@@ -169,7 +169,7 @@ public class RmiClient {
             System.out.print("Insira a senha: ");
             String password = scanner.nextLine();
 
-            if (isValid(username, password, Configuration.CREDENTIALS_FILE)) {
+            if (searchModule.login(username, password)) {
                 System.out.println("Login realizado com sucesso");
                 System.out.println(
                         "====================================================================================");
@@ -221,31 +221,6 @@ public class RmiClient {
         System.out.println("| 6.            Mostrar o menu                                                       |");
         System.out.println("| 7.            Login                                                                |");
         System.out.println(" ====================================================================================");
-    }
-
-    public boolean isValid(String username, String password, String filename) {
-        boolean valid = false;
-        try {
-            FileInputStream fileIn = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-
-            String user;
-            String pass;
-
-            user = (String) in.readObject();
-            pass = (String) in.readObject();
-
-            if (user.equals(username) && pass.equals(password)) {
-                valid = true;
-            }
-
-            in.close();
-
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Erro ao ler arquivo de credenciais");
-            e.printStackTrace();
-        }
-        return valid;
     }
 
 }

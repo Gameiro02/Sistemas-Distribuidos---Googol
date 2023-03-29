@@ -83,31 +83,43 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         List<String> result_impar = new ArrayList<String>();
         String palavrasAteM = separarPalavrasPorLetra(word);
         String palavrasDeNateZ = separarPalavrasPorLetra2(word);
-        System.out.println("Palavra: " + word);
-
-        System.out.println("Palavras ate M: " + palavrasAteM);
-        System.out.println("Palavras de N ate Z: " + palavrasDeNateZ);
 
         if (palavrasAteM != "") {
             int randomBarrel = gerarNumeroPar(Configuration.NUM_BARRELS);
+            boolean connected = false;
 
-            System.out.println("Barrel: " + randomBarrel);
-
-            BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
-            result_par = barrel.searchForWords(palavrasAteM, pageNumber);
+            while (!connected) {
+                try {
+                    BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
+                    result_par = barrel.searchForWords(palavrasAteM, pageNumber);
+                    connected = true;
+                } catch (RemoteException e) {
+                    // Barrel is not available, try another one
+                    randomBarrel = gerarNumeroPar(Configuration.NUM_BARRELS);
+                }
+            }
         }
+
         if (palavrasDeNateZ != "") {
             int randomBarrel = gerarNumeroImparAleatorio(Configuration.NUM_BARRELS);
-            System.out.println("Barrel: " + randomBarrel);
-            BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
-            result_impar = barrel.searchForWords(palavrasDeNateZ, pageNumber);
+            boolean connected = false;
+
+            while (!connected) {
+                try {
+                    BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
+                    result_impar = barrel.searchForWords(palavrasDeNateZ, pageNumber);
+                    connected = true;
+                } catch (RemoteException e) {
+                    // Barrel is not available, try another one
+                    randomBarrel = gerarNumeroImparAleatorio(Configuration.NUM_BARRELS);
+                }
+            }
         }
 
         List<String> result = new ArrayList<String>();
 
         // Check if both lists are not empty
         if (!result_par.isEmpty() && !result_impar.isEmpty()) {
-            // Join the results where both words are present
             for (String s : result_par) {
                 if (result_impar.contains(s)) {
                     result.add(s);
@@ -126,7 +138,6 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         }
 
         sortSearchDictionary();
-
         return result;
     }
 
@@ -184,17 +195,19 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         socket.close();
     }
 
+    @Override
+    public boolean login(String username, String password) throws RemoteException {
+        return adminPage.login(username, password);
+    }
+
     public static void main(String[] args) throws IOException, NotBoundException {
         SearchModule searchModule = new SearchModule();
-        writeCredentials();
         LocateRegistry.createRegistry(1099);
         Naming.rebind("SearchModule", searchModule);
 
         for (int i = 1; i <= Configuration.NUM_BARRELS; i++) {
             Barrel b = new Barrel(i);
             b.start();
-
-            // System.out.println("Barrel " + i + " is ready.");
         }
 
         for (int i = 1; i <= Configuration.NUM_DOWNLOADERS; i++) {
@@ -202,27 +215,12 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             try {
                 d.start();
             } catch (Exception e) {
-                // Enviar o url para o outro downloader
                 e.printStackTrace();
             }
-            // System.out.println("Downloader " + i + " is ready.");
         }
 
         searchModule.adminPage = new AdminPage(searchModule.searchDictionary);
         searchModule.adminPage.showMenu();
-    }
-
-    private static void writeCredentials() {
-        try {
-            FileOutputStream fileOut = new FileOutputStream(Configuration.CREDENTIALS_FILE);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(Configuration.LOGIN);
-            out.writeObject(Configuration.PASSWORD);
-            out.close();
-            fileOut.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

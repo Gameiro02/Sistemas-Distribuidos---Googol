@@ -153,9 +153,6 @@ public class Downloader extends Thread {
                 referencedUrls += link + " ";
         }
 
-        if (this.title == null)
-            this.title = "None; ";
-
         if (this.words == null)
             this.words = "None";
 

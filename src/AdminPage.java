@@ -3,7 +3,9 @@ package src;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.net.*;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 public class AdminPage {
     private ArrayList<String> downloaders;
@@ -121,6 +123,29 @@ public class AdminPage {
 
     public String getStringMenu() {
         return this.stringMenu;
+    }
+
+    public boolean login(String username, String password) {
+        boolean result = false;
+
+        try {
+            FileInputStream file = new FileInputStream(Configuration.CREDENTIALS_FILE);
+            ObjectInputStream in = new ObjectInputStream(file);
+
+            String user = (String) in.readObject();
+            String pass = (String) in.readObject();
+
+            if (user.equals(username) && pass.equals(password)) {
+                in.close();
+                result = true;
+            }
+
+            in.close();
+        } catch (Exception e) {
+            System.out.println("Erro ao ler ficheiro de credenciais");
+        }
+
+        return result;
     }
 
 }

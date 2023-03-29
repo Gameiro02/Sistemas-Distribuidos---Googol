@@ -1,8 +1,6 @@
 package src;
 
 public class Configuration {
-    public static final String LOGIN = "tintin";
-    public static final String PASSWORD = "unicorn";
     public static final String CREDENTIALS_FILE = "credentials.bin";
 
     public boolean DEBUG = true;
