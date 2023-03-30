@@ -1,9 +1,7 @@
 package src.SearchModule;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -81,8 +79,16 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 
         List<String> result_par = new ArrayList<String>();
         List<String> result_impar = new ArrayList<String>();
-        String palavrasAteM = separarPalavrasPorLetra(word);
-        String palavrasDeNateZ = separarPalavrasPorLetra2(word);
+        String palavrasAteM = "";
+        String palavrasDeNateZ = "";
+
+        try {
+            palavrasAteM = separarPalavrasPorLetra(word);
+            palavrasDeNateZ = separarPalavrasPorLetra2(word);
+        } catch (Exception e) {
+            System.out.println("Erro ao separar palavras");
+            return null;
+        }
 
         if (palavrasAteM != "") {
             int randomBarrel = gerarNumeroPar(Configuration.NUM_BARRELS);
@@ -118,23 +124,41 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 
         List<String> result = new ArrayList<String>();
 
-        // Check if both lists are not empty
-        if (!result_par.isEmpty() && !result_impar.isEmpty()) {
+        if (palavrasAteM == "") {
+            result = result_impar;
+        } else if (palavrasDeNateZ == "") {
+            result = result_par;
+        } else {
+            // Get the intersection of the two lists
             for (String s : result_par) {
                 if (result_impar.contains(s)) {
                     result.add(s);
                 }
             }
-        } else if (!result_par.isEmpty()) {
-            result = result_par;
-        } else if (!result_impar.isEmpty()) {
-            result = result_impar;
         }
 
-        if (this.searchDictionary.containsKey(word)) {
-            this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);
-        } else {
-            this.searchDictionary.put(word, 1);
+        // Page size is 10, return results 10 at a time
+        if (result.size() == 0 || result == null) {
+            return result;
+        }
+
+        try {
+            int start = (pageNumber - 1) * 10;
+            int end = pageNumber * 10;
+            if (end > result.size()) {
+                end = result.size();
+            }
+            List<String> sub = new ArrayList<String>(result.subList(start, end));
+            result = sub;
+        } catch (Exception e) {
+        }
+
+        if (pageNumber == 1) {
+            if (this.searchDictionary.containsKey(word)) {
+                this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);
+            } else {
+                this.searchDictionary.put(word, 1);
+            }
         }
 
         sortSearchDictionary();

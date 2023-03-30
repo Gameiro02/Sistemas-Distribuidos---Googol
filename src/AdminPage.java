@@ -66,11 +66,11 @@ public class AdminPage {
             this.downloaders.set(index - 1, status + " - " + url);
         } else if (msg_split[0].split("\\|")[1].trim().equals("Barrel")) {
             int index = Integer.parseInt(msg_split[1].split("\\|")[1].trim());
-            String ip = msg_split[2].split("\\|")[1].trim();
-            String port = msg_split[3].split("\\|")[1].trim();
-            String status = msg_split[4].split("\\|")[1].trim();
+            String status = msg_split[2].split("\\|")[1].trim();
+            String ip = msg_split[3].split("\\|")[1].trim();
+            String port = msg_split[4].split("\\|")[1].trim();
 
-            this.barrels.set(index - 1, ip + ":" + port + " - " + status);
+            this.barrels.set(index - 1, status + ":" + ip + " - " + port);
         }
     }
 

@@ -31,6 +31,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     private HashMap<String, ArrayList<String>> linksMap; // <<url>, <title, description, url1, url2, ...>>
     private HashMap<String, Integer> auxMap;
 
+    private String stats;
+
     public Barrel(int index) throws IOException, RemoteException {
         this.INDEXFILE = "src\\Barrels\\BarrelFiles\\Barrel" + index + ".txt";
         this.LINKSFILE = "src\\Barrels\\BarrelFiles\\Links" + index + ".txt";
@@ -38,6 +40,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         this.indexMap = new HashMap<>();
         this.linksMap = new HashMap<>();
         this.auxMap = new HashMap<>();
+        this.stats = "Waiting";
 
         File f = new File(INDEXFILE);
 
@@ -93,7 +96,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 data = textParser(received);
                 if (data == null)
                     continue;
-
+                
                 writeToFile(data);
                 writeToLinksFile(data);
                 writeToHashMaps(data);
@@ -227,22 +230,26 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         }
     }
 
-    private void writeToLinksFile(ArrayList<String> data) throws IOException {
+    private void writeToLinksFile(ArrayList<String> data) {
 
         String[] firstElement = data.get(0).split("\\|"); // url|referencedUrl1|referencedUrl2|...
         String url = firstElement[0];
 
         List<String> lines = new ArrayList<String>();
-        BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            lines.add(line);
-            if (line.split(";")[0].equals(url)) {
-                reader.close();
-                return;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(LINKSFILE));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+                if (line.split(";")[0].equals(url)) {
+                    reader.close();
+                    return;
+                }
             }
+            reader.close();
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o ficheiro dos links");
         }
-        reader.close();
 
         String otherUrls = "";
         for (int i = 2; i < firstElement.length; i++) {
@@ -279,12 +286,16 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 return;
             }
 
-            FileWriter writer = new FileWriter(LINKSFILE, true);
-            writer.write(linha);
-            // System.out.println("Barrel[" + this.index + "] " + linha + " stored in
-            // barrel");
-            writer.write(System.getProperty("line.separator"));
-            writer.close();
+            try {
+                FileWriter writer = new FileWriter(LINKSFILE, true);
+                writer.write(linha);
+                // System.out.println("Barrel[" + this.index + "] " + linha + " stored in
+                // barrel");
+                writer.write(System.getProperty("line.separator"));
+                writer.close();
+            } catch (IOException e) {
+                System.err.println("Erro ao ler o ficheiro dos links [2]");
+            }
         }
     }
 
@@ -378,6 +389,14 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     private void sendStatus(String status) throws IOException {
+
+        // Compare this.stats with status
+        if (this.stats.equals(status)) {
+            return;
+        }
+
+        this.stats = status;
+
         InetAddress group = InetAddress.getByName(Configuration.MULTICAST_ADDRESS);
         MulticastSocket socket = new MulticastSocket(Configuration.MULTICAST_PORT);
 
@@ -403,7 +422,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 System.out.println("Barrel[" + this.index + "] simulated a crash while searching for words");
                 throw new RemoteException();
             }
-        }  
+        }
 
         String words[] = word.split(" ");
         auxMap.clear();
@@ -464,13 +483,13 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         });
 
-        // Return the results, 10 per page
-        int start = (pageNumber - 1) * 10;
-        int end = start + 10;
-        if (end > results.size()) {
-            end = results.size();
-        }
-        results = new ArrayList<String>(results.subList(start, end));
+        // System.out.println("=======================================");
+        // System.out.println("Barrel size: " + linksMap.size());
+        // System.out.println("Found this for the search: " + word);
+        // for (String result : results) {
+        //     System.out.println(result);
+        // }
+        // System.out.println("=======================================");
         return results;
     }
 }

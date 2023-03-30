@@ -62,6 +62,13 @@ public class Downloader extends Thread {
             } catch (ConnectException e) {
                 System.out.println(
                         "Downloader[" + this.ID + "] [Connection failed] failed to connect to url: " + this.url);
+                try {
+                    this.links.clear();
+                    this.links.add(this.url);
+                    sendLinkToQueue(true);
+                } catch (Exception e1) {
+                    System.err.println("Downloader[" + this.ID + "] failed to send url to queue");
+                }
                 continue;
             } catch (Exception e) {
                 System.err.println("Downloader[" + this.ID + "] [Not valid] failed to download url: " + this.url);
