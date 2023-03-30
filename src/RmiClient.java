@@ -122,7 +122,7 @@ public class RmiClient {
         }
 
         int pageNumber = 1;
-        List<String> resultList = searchModule.searchForWords(words, pageNumber);        
+        List<String> resultList = searchModule.searchForWords(words);        
 
         int i = 0;
         while (true) {

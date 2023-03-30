@@ -71,7 +71,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
     }
 
     @Override
-    public List<String> searchForWords(String word, int pageNumber)
+    public List<String> searchForWords(String word)
             throws NotBoundException, FileNotFoundException, IOException {
 
         // Oo barrels pares contem informação sobre as palavras que começam pelas letras
@@ -140,12 +140,10 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             }
         }
 
-        if (pageNumber == 1) {
-            if (this.searchDictionary.containsKey(word)) {
-                this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);
-            } else {
-                this.searchDictionary.put(word, 1);
-            }
+        if (this.searchDictionary.containsKey(word)) {
+            this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);
+        } else {
+            this.searchDictionary.put(word, 1);
         }
 
         sortSearchDictionary();
