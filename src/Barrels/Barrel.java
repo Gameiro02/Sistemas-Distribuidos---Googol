@@ -483,13 +483,6 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
             }
         });
 
-        // System.out.println("=======================================");
-        // System.out.println("Barrel size: " + linksMap.size());
-        // System.out.println("Found this for the search: " + word);
-        // for (String result : results) {
-        //     System.out.println(result);
-        // }
-        // System.out.println("=======================================");
         return results;
     }
 }

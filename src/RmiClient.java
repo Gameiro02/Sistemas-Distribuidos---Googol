@@ -103,9 +103,9 @@ public class RmiClient {
         String words = scanner.nextLine();
 
         int pageNumber = 1;
+        List<String> resultList = searchModule.searchForWords(words, pageNumber);
+        int i = 0;
         while (true) {
-            List<String> resultList = searchModule.searchForWords(words, pageNumber);
-
             System.out.println("====================================================================================");
             System.out.println("Resultados da pesquisa:");
 
@@ -125,14 +125,21 @@ public class RmiClient {
                 break;
             }
 
-            for (String result : resultList) {
-                String[] fields = result.split(";");
+            boolean info = false;
+
+            for (int j = i; j < resultList.size(); j++) {
+                if (j == pageNumber * 10)
+                    break;
+                String fields[] = resultList.get(j).split(";");
                 System.out.println("Link: " + fields[0]);
                 System.out.println("Título: " + fields[1]);
                 System.out.println("Descrição: " + fields[2] + "\n");
+                info = true;
+                i++;
             }
 
-            if (resultList.size() < 10) {
+            // If i not multiple of
+            if (!info || i % 10 != 0) {
                 System.out.println("Não há mais resultados");
                 System.out.println(
                         "====================================================================================");

@@ -57,6 +57,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         while (numeroImparAleatorio % 2 == 0) {
             numeroImparAleatorio = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
         }
+        // System.out.println("Numero impar: " + numeroImparAleatorio);
         return numeroImparAleatorio;
     }
 
@@ -65,6 +66,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         while (numeroPar % 2 == 1) {
             numeroPar = (int) (Math.random() * Configuration.NUM_BARRELS) + 1;
         }
+        // System.out.println("Numero par: " + numeroPar);
         return numeroPar;
     }
 
@@ -96,7 +98,8 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 
             while (!connected) {
                 try {
-                    BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
+                    BarrelInterface barrel = (BarrelInterface) Naming
+                            .lookup("rmi://localhost/Barrel" + randomBarrel);
                     result_par = barrel.searchForWords(palavrasAteM, pageNumber);
                     connected = true;
                 } catch (RemoteException e) {
@@ -112,7 +115,8 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 
             while (!connected) {
                 try {
-                    BarrelInterface barrel = (BarrelInterface) Naming.lookup("rmi://localhost/Barrel" + randomBarrel);
+                    BarrelInterface barrel = (BarrelInterface) Naming
+                            .lookup("rmi://localhost/Barrel" + randomBarrel);
                     result_impar = barrel.searchForWords(palavrasDeNateZ, pageNumber);
                     connected = true;
                 } catch (RemoteException e) {
@@ -137,22 +141,6 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             }
         }
 
-        // Page size is 10, return results 10 at a time
-        if (result.size() == 0 || result == null) {
-            return result;
-        }
-
-        try {
-            int start = (pageNumber - 1) * 10;
-            int end = pageNumber * 10;
-            if (end > result.size()) {
-                end = result.size();
-            }
-            List<String> sub = new ArrayList<String>(result.subList(start, end));
-            result = sub;
-        } catch (Exception e) {
-        }
-
         if (pageNumber == 1) {
             if (this.searchDictionary.containsKey(word)) {
                 this.searchDictionary.put(word, this.searchDictionary.get(word) + 1);
@@ -163,6 +151,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
 
         sortSearchDictionary();
         return result;
+
     }
 
     private void sortSearchDictionary() {
