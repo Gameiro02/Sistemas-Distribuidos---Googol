@@ -1,0 +1,8 @@
+Para correr o software:
+1. Correr o ficheiro UrlQueue.java
+2. Correr o ficheiro SearchModule.java
+   
+Para usar o software como cliente:
+- Correr uma instância do RmiClient.java
+
+Depois apenas tem de usar o menu que aparece no terminal do lado do cliente para fazer as operações desejadas.

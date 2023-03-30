@@ -92,7 +92,15 @@ A URL Queue possui duas Threads:
 
 
 # Prótocolo Multicast
+O protucolo multicast é usado para a comunicação entre os Storage Barrels e os Downloaders e entre os Downloaders/Storage Barrels para a Admin Page.
+O protocolo é o seguinte:
+    - O Protocolo usado para a comunicação entre os Storage Barrels e os Downloaders é o seguinte:
+        type | url; item_count | number; url | www.example.com; referenced_urls | url1 url2 url3; title | title; words | word1 word2 word3 
+    - O Protocolo usado para a comunicação entre os Downloaders/Storage Barrels para a Admin Page é o seguinte:
+        type | Downloader; index | index_number; status | Active; url | www.example.com;
+        type | Barrel; index | 0; status | Active; ip | ip_example; port | 1234;
 
+Em qualquer sitio onde seja recebida mensagens por multicast, é feito o parsing da mesma de forma a obter os dados desejados. Por exemplo, no caso do Downloader, é feito o parsing da mensagem para obter o index do Downloader, o seu estado e o URL que está a processar. No caso do Storage Barrel, é feito o parsing da mensagem para obter o index do Storage Barrel, o seu estado, o IP e o Porto.
 
 
 # Tratamento de Erros
