@@ -95,6 +95,16 @@ public class RmiClient {
         scanner.close();
     }
 
+    private boolean checkSearchFormat(String query) {
+        String[] words = query.split(" ");
+        for (String word : words) {
+            if (word.matches("[^a-zA-Z0-9\\p{L};]+") || word.contains(";")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void searchWord(SearchModuleInterface searchModule, Scanner scanner)
             throws RemoteException, MalformedURLException, NotBoundException, FileNotFoundException, IOException {
 
@@ -102,8 +112,18 @@ public class RmiClient {
         scanner.nextLine();
         String words = scanner.nextLine();
 
+        if (!checkSearchFormat(words)) {
+            System.out.println("Formato de pesquisa inválido");
+            System.out.println(
+                    "====================================================================================");
+            System.out.println("Digite 6 para exibir o menu novamente");
+            System.out.print("Digite o comando desejado: ");
+            return;
+        }
+
         int pageNumber = 1;
-        List<String> resultList = searchModule.searchForWords(words, pageNumber);
+        List<String> resultList = searchModule.searchForWords(words, pageNumber);        
+
         int i = 0;
         while (true) {
             System.out.println("====================================================================================");

@@ -88,8 +88,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
             palavrasAteM = separarPalavrasPorLetra(word);
             palavrasDeNateZ = separarPalavrasPorLetra2(word);
         } catch (Exception e) {
-            System.out.println("Erro ao separar palavras");
-            return null;
+            System.out.println("Erro ao separar palavras por letra");
         }
 
         if (palavrasAteM != "") {
@@ -100,7 +99,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
                 try {
                     BarrelInterface barrel = (BarrelInterface) Naming
                             .lookup("rmi://localhost/Barrel" + randomBarrel);
-                    result_par = barrel.searchForWords(palavrasAteM, pageNumber);
+                    result_par = barrel.searchForWords(palavrasAteM);
                     connected = true;
                 } catch (RemoteException e) {
                     // Barrel is not available, try another one
@@ -117,7 +116,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
                 try {
                     BarrelInterface barrel = (BarrelInterface) Naming
                             .lookup("rmi://localhost/Barrel" + randomBarrel);
-                    result_impar = barrel.searchForWords(palavrasDeNateZ, pageNumber);
+                    result_impar = barrel.searchForWords(palavrasDeNateZ);
                     connected = true;
                 } catch (RemoteException e) {
                     // Barrel is not available, try another one

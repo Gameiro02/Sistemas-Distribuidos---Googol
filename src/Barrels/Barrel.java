@@ -413,7 +413,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     }
 
     @Override
-    public List<String> searchForWords(String word, int pageNumber) throws FileNotFoundException, IOException {
+    public List<String> searchForWords(String word) throws FileNotFoundException, IOException {
 
         // Randomly throws RemoteException to simulate a crash
         if (Configuration.AUTO_FAIL_BARRELS) {
