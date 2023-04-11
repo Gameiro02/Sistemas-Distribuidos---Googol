@@ -4,9 +4,9 @@ public class Configuration {
     public static final String CREDENTIALS_FILE = "credentials.bin";
 
     public boolean DEBUG = true;
-    public static boolean COLD_START = true; // Experimental
-    public static boolean AUTO_FAIL_BARRELS = true;
-    public static boolean AUTO_FAIL_DOWNLOADERS = true;
+    public static boolean COLD_START = false;
+    public static boolean AUTO_FAIL_BARRELS = false;
+    public static boolean AUTO_FAIL_DOWNLOADERS = false;
 
     // TCP ports
     public static final int PORT_A = 8080;

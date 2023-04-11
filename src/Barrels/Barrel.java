@@ -62,6 +62,8 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         if (Configuration.COLD_START) {
             f.delete();
             f.createNewFile();
+        } else {
+            writeToHashMaps();
         }
 
         UnicastRemoteObject.exportObject(this, 0);
@@ -99,7 +101,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 
                 writeToFile(data);
                 writeToLinksFile(data);
-                writeToHashMaps(data);
+                writeToHashMaps();
                 sendStatus("Waiting");
             }
 
@@ -177,7 +179,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
         return data;
     }
 
-    private void writeToHashMaps(ArrayList<String> data) {
+    private void writeToHashMaps() {
 
         synchronized (linksMap) {
             try {

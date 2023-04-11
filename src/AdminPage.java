@@ -2,6 +2,9 @@ package src;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import src.Configuration;
+
 import java.net.*;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -136,11 +139,9 @@ public class AdminPage {
             FileInputStream file = new FileInputStream(Configuration.CREDENTIALS_FILE);
             ObjectInputStream in = new ObjectInputStream(file);
 
-            String user = (String) in.readObject();
-            String pass = (String) in.readObject();
+            HashMap<String, String>users = (HashMap<String, String>) in.readObject();
 
-            if (user.equals(username) && pass.equals(password)) {
-                in.close();
+            if (users.containsKey(username) && users.get(username).equals(password)) {
                 result = true;
             }
 
