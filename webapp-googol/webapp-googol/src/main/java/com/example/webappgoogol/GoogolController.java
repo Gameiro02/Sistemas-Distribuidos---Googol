@@ -114,4 +114,9 @@ public class GoogolController {
         return "listPages";
     }
 
+    // redirect the root to the search page
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/search";
+    }
 }
