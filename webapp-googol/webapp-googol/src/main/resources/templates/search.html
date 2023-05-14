@@ -5,15 +5,17 @@
     <title>Search Engine</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="\Css\SearchEngine.css">
+    <link rel="stylesheet" href="\SearchEngine.css">
 </head>
 
 <body>
     <h1>Search Engine</h1>
     <form action="/search" method="get">
         <label for="search-input">Search:</label>
-        <input type="text" id="search-input" name="q" required>
+        <input type="text" id="search-input" name="query" required>
         <button type="submit">Search</button>
+
+        <p th:text="'Results for query: ' + ${results}"></p>
     </form>
 </body>
 

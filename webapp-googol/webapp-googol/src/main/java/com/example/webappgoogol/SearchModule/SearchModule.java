@@ -79,6 +79,8 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         // É necessário verificar em qual dos dois barrels a palavra se encontra ou se
         // se encontra em ambos
 
+        System.out.println("SEARCHING FOR WORDS: " + word + "\n");
+
         List<String> result_par = new ArrayList<String>();
         List<String> result_impar = new ArrayList<String>();
         String palavrasAteM = "";
