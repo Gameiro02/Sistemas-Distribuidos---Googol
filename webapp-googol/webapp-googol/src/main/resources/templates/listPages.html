@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Search Engine</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="\SearchEngine.css">
+</head>
+
+<body>
+    <h1>List Pages</h1>
+    <form action="/listPages" method="get">
+        <label for="page-input">Url:</label>
+        <input type="text" id="page-input" name="url" required>
+        <button type="submit">List</button>
+
+        <p th:text="'Results for query: ' + ${results}"></p>
+    </form>
+</body>
+
+</html>

@@ -70,4 +70,48 @@ public class GoogolController {
         return "search";
     }
 
+    @GetMapping("/indexNewUrl")
+    public String indexNewUrl(@RequestParam(name = "url", required = false, defaultValue = "") String url,
+            Model model) {
+
+        if (url.equals("")) {
+            return "indexNewUrl";
+        }
+        System.out.println("url = " + url);
+
+        try {
+            searchModule.IndexarUmNovoUrl(url);
+            String message = "Url indexada com sucesso!";
+            model.addAttribute("results", message);
+        } catch (Exception e) {
+            System.out.println("Erro ao conectar com o servidor!!!!!!!");
+            try {
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        return "indexNewUrl";
+    }
+
+    @GetMapping("/listPages")
+    public String listPages(@RequestParam(name = "url", required = false, defaultValue = "") String url, Model model) {
+
+        System.out.println("url to list = " + url);
+
+        try {
+            List<String> results = searchModule.linksToAPage(url);
+            System.out.println("results = " + results);
+            model.addAttribute("results", results);
+        } catch (Exception e) {
+            System.out.println("Erro ao conectar com o servidor!!!!!!!");
+            try {
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        return "listPages";
+    }
+
 }
