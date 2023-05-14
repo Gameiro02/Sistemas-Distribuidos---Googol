@@ -187,6 +187,7 @@ public class RmiClient {
     private void checkLogin(SearchModuleInterface searchModule, Scanner scanner, int command)
             throws FileNotFoundException, IOException, NotBoundException {
         boolean justLogged = false;
+        login = true;
         if (!login) {
             if (command == 3)
                 System.out.println("Para utilizar esta função, é necessário estar logado");

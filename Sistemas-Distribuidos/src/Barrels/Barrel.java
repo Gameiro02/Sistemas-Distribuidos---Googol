@@ -34,8 +34,10 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
     private String stats;
 
     public Barrel(int index) throws IOException, RemoteException {
-        this.INDEXFILE = "src\\Barrels\\BarrelFiles\\Barrel" + index + ".txt";
-        this.LINKSFILE = "src\\Barrels\\BarrelFiles\\Links" + index + ".txt";
+        this.INDEXFILE = "webapp-googol\\webapp-googol\\src\\main\\java\\com\\example\\webappgoogol\\Barrels\\BarrelFiles\\Barrel"
+                + index + ".txt";
+        this.LINKSFILE = "webapp-googol\\webapp-googol\\src\\main\\java\\com\\example\\webappgoogol\\Barrels\\BarrelFiles\\Links"
+                + index + ".txt";
         this.index = index;
         this.indexMap = new HashMap<>();
         this.linksMap = new HashMap<>();
@@ -98,7 +100,7 @@ public class Barrel extends Thread implements BarrelInterface, Serializable {
                 data = textParser(received);
                 if (data == null)
                     continue;
-                
+
                 writeToFile(data);
                 writeToLinksFile(data);
                 writeToHashMaps();
