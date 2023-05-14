@@ -9,7 +9,7 @@ public class Configuration {
     public static boolean AUTO_FAIL_DOWNLOADERS = false;
 
     // TCP ports
-    public static final int PORT_A = 8080;
+    public static final int PORT_A = 8082; // Had to change cause of spring-boot
     public static final int PORT_B = 8081;
 
     public static final int MULTICAST_PORT = 4321;
