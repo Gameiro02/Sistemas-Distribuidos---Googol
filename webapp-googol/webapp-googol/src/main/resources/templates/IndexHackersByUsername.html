@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Search Engine</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="\SearchEngine.css">
+</head>
+
+<body>
+    <h1>Index Hackers By Username</h1>
+    <form action="/IndexHackersByUsername" method="get">
+        <label for="page-input">Username</label>
+        <input type="text" id="page-input" name="username" required>
+        <button type=" submit">Index</button>
+
+        <p th:text="'Results for query: ' + ${results}"></p>
+    </form>
+</body>
+
+</html>

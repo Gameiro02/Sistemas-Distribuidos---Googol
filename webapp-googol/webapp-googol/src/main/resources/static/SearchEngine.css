@@ -34,7 +34,7 @@ input[type="text"] {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-button[type="submit"] {
+button {
     padding: 10px 20px;
     font-size: 18px;
     border-radius: 5px;
@@ -46,6 +46,6 @@ button[type="submit"] {
     transition: background-color 0.3s ease-in-out;
 }
 
-button[type="submit"]:hover {
+button:hover {
     background-color: #3e8e41;
 }

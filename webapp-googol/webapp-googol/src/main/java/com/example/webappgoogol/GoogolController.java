@@ -121,10 +121,31 @@ public class GoogolController {
         return "listPages";
     }
 
-    // redirect the root to the search page
-    @GetMapping("/")
-    public String root() {
-        return "redirect:/search";
+    @GetMapping("/IndexHackersByUsername")
+    public String IndexHackersByUsername(
+            @RequestParam(name = "username", required = false, defaultValue = "") String username, Model model) {
+        List<String> results = new ArrayList<String>();
+        try {
+            results = hackerNewsAPI.getUserStories(username);
+
+            if (results.size() == 0) {
+                model.addAttribute("results", "O utilizador não existe ou não tem histórias!");
+                return "IndexHackersByUsername";
+            }
+
+            model.addAttribute("results", results);
+            System.out.println("results = " + results);
+            for (String url : results) {
+                searchModule.IndexarUmNovoUrl(url);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao conectar com o servidor!!!!!!!");
+            try {
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+        return "IndexHackersByUsername";
     }
 
     @GetMapping("/admin")
@@ -175,6 +196,16 @@ public class GoogolController {
     public Mensagem greeting() throws Exception {
         Thread.sleep(1000); // simulated delay
         return new Mensagem(searchModule.getStringMenu());
+    }
+
+    @GetMapping("/")
+    public String root() {
+        return "search";
+    }
+
+    @GetMapping("/teste")
+    public String teste() {
+        return "teste";
     }
 
 }
