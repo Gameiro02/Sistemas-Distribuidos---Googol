@@ -14,8 +14,8 @@ public class UrlQueue {
     public UrlQueue() {
         queue = new LinkedList<String>();
         visited = new ArrayList<String>();
-        queue.add("https://www.google.com/");
-        visited.add("https://www.google.com/");
+        // queue.add("https://www.google.com/");
+        // visited.add("https://www.google.com/");
     }
 
     public void addUrl(String url, boolean resend) {
