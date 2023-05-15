@@ -1,0 +1,12 @@
+http://127.0.0.1:5500/Tests/Test_Site1.html|http://127.0.0.1:5500/Tests/Test_Site5.html|http://127.0.0.1:5500/Tests/Test_Site11.html|http://127.0.0.1:5500/Tests/Test_Site10.html|http://127.0.0.1:5500/Tests/Test_Site6.html|http://127.0.0.1:5500/Tests/Test_Site9.html|http://127.0.0.1:5500/Tests/Test_Site12.html|http://127.0.0.1:5500/Tests/Test_Site3.html|http://127.0.0.1:5500/Tests/Test_Site4.html|http://127.0.0.1:5500/Tests/Test_Site7.html;Site de testes 1;bom dia 123 Hey It was the best sandcastle he had ever seen Link Link 
+http://127.0.0.1:5500/Tests/Test_Site2.html;Site de testes 2;2 Test bla bla Hey Ola I had a friend in high school named Rick 
+http://127.0.0.1:5500/Tests/Test_Site5.html;Site de testes 5;bom dia 123 Hey Two seats were vacant Gameiro z 
+http://127.0.0.1:5500/Tests/Test_Site10.html;Site de testes 10;bom dia 123 Hey Patricia loves the sound of nails strongly pressed against the chalkboard 
+http://127.0.0.1:5500/Tests/Test_Site11.html;Site de testes 11;bom dia 123 Hey His confidence would have bee admirable if it wasnt for his 
+http://127.0.0.1:5500/Tests/Test_Site6.html;Site de testes 6;bom dia 123 Hey I made myself a peanut butter sandwich as I didnt want 
+http://127.0.0.1:5500/Tests/Test_Site9.html;Site de testes 9;bom dia 123 Hey The tree fell unexpectedly short Link Gameiro z 
+http://127.0.0.1:5500/Tests/Test_Site12.html;Site de testes 12;berro cao dog Gameiro z 
+http://127.0.0.1:5500/Tests/Test_Site7.html;Site de testes 7;bom dia 123 Hey She wasnt sure whether to be impressed or concerned that he 
+http://127.0.0.1:5500/Tests/Test_Site3.html;Site de testes 3;o 3º site de testes Aqui vamos fazer umas experiências muito bacanas It was a 
+http://127.0.0.1:5500/Tests/Test_Site4.html|http://127.0.0.1:5500/Tests/Test_Site8.html;Site de testes 4;bom dia 123 Hey He knew it was going to be a bad day when 
+http://127.0.0.1:5500/Tests/Test_Site8.html;Site de testes 8;bom dia 123 Hey Lightning Paradise was the local hangout joint where the group usually 

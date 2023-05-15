@@ -119,4 +119,5 @@ public class GoogolController {
     public String root() {
         return "redirect:/search";
     }
+
 }
