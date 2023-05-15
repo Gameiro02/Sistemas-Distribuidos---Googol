@@ -1,10 +1,9 @@
-var ws = new WebSocket("/ws");
+var socket = new SockJS('/ws');
+var stompClient = Stomp.over(socket);
+stompClient.connect({}, function (frame) {
+    console.log('Connected: ' + frame);
+});
 
-function sendMessage() {
-    var message = "Hello World";
-    ws.send("/app/message", {}, JSON.stringify({'content': message}));
-}
-
-function showMessage(message) {
-    console.log(message);
-} 
+stompClient.subscribe('/admin/updates', function (AdminInfo) {
+    console.log("AdminInfo: " + AdminInfo);
+});
