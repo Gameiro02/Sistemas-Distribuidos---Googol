@@ -32,14 +32,17 @@ import java.io.*;
 import java.net.MalformedURLException;
 
 import com.example.webappgoogol.SearchModule.SearchModuleInterface;
+import com.example.webappgoogol.HackerNewsAPI.HackerNewsAPI;
 
 @Controller
 public class GoogolController {
     private SearchModuleInterface searchModule;
+    private HackerNewsAPI hackerNewsAPI;
 
     @Autowired
     public GoogolController(SearchModuleInterface searchModule) {
         this.searchModule = searchModule;
+        this.hackerNewsAPI = new HackerNewsAPI();
     }
 
     // localhost:8080/greeting?name=Gonçalo&othername=Gameiro
@@ -140,6 +143,38 @@ public class GoogolController {
             System.out.println("Error: " + e.getMessage());
         }
         return new AdminInfo(HtmlUtils.htmlEscape(adminInfo.content()));
+    }
+
+    @GetMapping("/IndexHackersNews")
+    public String IndexHackersNews(Model model) {
+        List<String> results = new ArrayList<String>();
+        model.addAttribute("results", "A indexar os top stories do Hacker News");
+        try {
+            results = hackerNewsAPI.getTopStories();
+            for (String url : results) {
+                searchModule.IndexarUmNovoUrl(url);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao conectar com o servidor!!!!!!!");
+            try {
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+        model.addAttribute("results", "Correu tudo bem");
+        return "search";
+    }
+
+    @GetMapping("/socketsss")
+    public String socketsss() {
+        return "seila";
+    }
+
+    @MessageMapping("/hello")
+    @SendTo("/topic/admin")
+    public Mensagem greeting() throws Exception {
+        Thread.sleep(1000); // simulated delay
+        return new Mensagem(searchModule.getStringMenu());
     }
 
 }
