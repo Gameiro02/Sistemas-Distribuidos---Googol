@@ -15,6 +15,9 @@ import org.json.simple.parser.JSONParser;
  */
 public class HackerNewsAPI {
 
+    /**
+     * Main method for testing purposes
+     */
     public static void main(String[] args) {
         HackerNewsAPI hackerNewsAPI = new HackerNewsAPI();
         hackerNewsAPI.getTopStories();
