@@ -2,6 +2,7 @@ var stompClient = null;
 
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
+    // $("#disconnect").prop("disabled", !connected);
     if (connected) {
         $("#conversation").show();
     } else {
@@ -24,6 +25,14 @@ function connect() {
         sendName(); // Envia o nome automaticamente após a conexão
     });
 }
+
+// function disconnect() {
+//     if (stompClient !== null) {
+//         stompClient.disconnect();
+//     }
+//     setConnected(false);
+//     console.log("Disconnected");
+// }
 
 function sendName() {
     stompClient.send("/app/hello", {}, JSON.stringify({ 'name': $("#name").val() }));
@@ -48,31 +57,11 @@ function formatMessage(message) {
     return formattedMessage;
 }
 
-function updateMessages() {
-    $.ajax({
-        url: 'url_do_servidor', // Substitua pela URL que retorna as mensagens atualizadas
-        method: 'GET', // Use GET, POST ou outro método apropriado
-        success: function (response) {
-            // Manipule a resposta recebida do servidor
-            // Verifique se há novas mensagens e adicione-as à lista de saudações
-            response.forEach(function (message) {
-                var formattedMessage = formatMessage(message);
-                showGreeting(formattedMessage);
-            });
-        },
-        error: function (error) {
-            // Manipule erros, se houver
-        }
-    });
-}
-
 $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
+    // $("#disconnect").click(function () { disconnect(); });
 
     connect(); // Conecta automaticamente ao carregar a página
-
-    // Chama a função de atualizar mensagens em intervalos regulares
-    setInterval(updateMessages, 5000); // 5000 milissegundos = 5 segundos
 });
