@@ -171,7 +171,7 @@ public class GoogolController {
     }
 
     @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
+    @SendTo("/topic/admin")
     public Mensagem greeting() throws Exception {
         Thread.sleep(1000); // simulated delay
         return new Mensagem(searchModule.getStringMenu());
