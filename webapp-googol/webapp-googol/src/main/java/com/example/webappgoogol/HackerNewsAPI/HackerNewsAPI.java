@@ -14,6 +14,12 @@ import org.json.simple.parser.JSONParser;
  * This class is responsible for getting the top stories and the stories of a given user from Hacker News API. <p>
  */
 public class HackerNewsAPI {
+
+    public static void main(String[] args) {
+        HackerNewsAPI hackerNewsAPI = new HackerNewsAPI();
+        hackerNewsAPI.getUserStories("hsdahsdsadsadsadsa");
+    }
+
     /**
      * Returns a List object with the urls of the top stories in Hacker News. <p>
      * This method might take a while to run.
@@ -30,23 +36,23 @@ public class HackerNewsAPI {
             URL url = new URL("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"); // URL that returns the top stories
 
             // Open the connection
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
-            StringBuffer content = new StringBuffer();
+            StringBuffer response = new StringBuffer();
 
             // Read the response from the API
             while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
+                response.append(inputLine);
             }
 
             // Close the connection
             in.close();
-            con.disconnect();
+            connection.disconnect();
 
-            String[] contentList = content.toString().split(", ");
+            String[] contentList = response.toString().split(", ");
 
             // Remove "[ " and " ]" from first and last element
             contentList[0] = contentList[0].substring(2);
@@ -80,25 +86,30 @@ public class HackerNewsAPI {
             URL url = new URL("https://hacker-news.firebaseio.com/v0/user/" + username + ".json?print=pretty"); // URL that returns the stories of the user
 
             // Open the connection
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
-            StringBuffer content = new StringBuffer();
+            StringBuffer response = new StringBuffer();
 
             // Read the response from the API
             while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
+                response.append(inputLine);
             }
 
             // Close the connection
             in.close();
-            con.disconnect();
+            connection.disconnect();
 
             // Parse the JSON response
             JSONParser parser = new JSONParser();
-            JSONObject userObject = (JSONObject) parser.parse(content.toString());
+            JSONObject userObject = (JSONObject) parser.parse(response.toString());
+
+            if (userObject == null) {
+                System.out.println("User not found");
+                return null;
+            }
 
             // Get the stories ids
             String[] contentList = userObject.get("submitted").toString().split(",");
