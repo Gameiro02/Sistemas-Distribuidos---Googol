@@ -1,10 +1,11 @@
-username: tintin
-password: unicorn
+- Web Server conecta-se por RMI ao Search Module, e este objeto que tem o RMI faz várias threads para cada pedido.
 
-username: user1
-password: pass1
+- Usernames and Passwords:
+    username: tintin
+    password: unicorn
 
-username: nome
-password: senha
+    username: user1
+    password: pass1
 
-// Alterar cold start no barrel
+    username: nome
+    password: senha

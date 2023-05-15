@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.HtmlUtils;
+
 import java.util.*;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -118,6 +122,24 @@ public class GoogolController {
     @GetMapping("/")
     public String root() {
         return "redirect:/search";
+    }
+
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin";
+    }
+
+    // /admin = /topic
+    @MessageMapping("/update")
+    @SendTo("/admin/updates")
+    public AdminInfo onMessage(AdminInfo adminInfo) {
+        System.out.println("AdminInfo: " + adminInfo);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return new AdminInfo(HtmlUtils.htmlEscape(adminInfo.content()));
     }
 
 }
