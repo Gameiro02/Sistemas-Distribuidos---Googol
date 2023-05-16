@@ -1,4 +1,5 @@
 var stompClient = null;
+var isFirstMessage = true; // Variável de controle
 
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
@@ -21,6 +22,12 @@ function connect() {
             var message = JSON.parse(greeting.body).content;
             var formattedMessage = formatMessage(message);
             showGreeting(formattedMessage);
+
+            if (!isFirstMessage) { // Atualiza o JSON exibido somente se não for a primeira mensagem
+                updateJsonOnScreen();
+            } else {
+                isFirstMessage = false;
+            }
         });
         sendName(); // Envia o nome automaticamente após a conexão
     });
@@ -39,8 +46,10 @@ function sendName() {
 }
 
 function showGreeting(message) {
+    $("#greetings").empty(); // Limpa as mensagens anteriores
     $("#greetings").append("<tr><td>" + message + "</td></tr>");
 }
+
 
 function formatMessage(message) {
     var lines = message.split('\n');
@@ -71,3 +80,16 @@ $(function () {
 
     connect(); // Conecta automaticamente ao carregar a página
 });
+
+function updateJsonOnScreen() {
+    $.ajax({
+        url: '/api/getJson', // URL para obter o JSON atualizado
+        method: 'GET',
+        success: function (response) {
+            $("#jsonDisplay").html(response); // Atualiza o JSON exibido na tela
+        },
+        error: function (error) {
+            console.log('Failed to update JSON:', error);
+        }
+    });
+}

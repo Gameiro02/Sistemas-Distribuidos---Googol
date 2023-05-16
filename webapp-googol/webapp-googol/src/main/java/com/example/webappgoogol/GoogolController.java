@@ -13,13 +13,13 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.util.HtmlUtils;
 
 import com.example.webappgoogol.SearchModule.SearchModuleInterface;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +31,9 @@ import com.example.webappgoogol.HackerNewsAPI.HackerNewsAPI;
 public class GoogolController {
     private SearchModuleInterface searchModule;
     private HackerNewsAPI hackerNewsAPI;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public GoogolController(SearchModuleInterface searchModule) {
@@ -51,7 +54,7 @@ public class GoogolController {
     // the ${query} variable
     @GetMapping("/search")
     public String search(@RequestParam(name = "query", required = false, defaultValue = "") String query,
-            Model model) {
+            Model model) throws Exception {
 
         System.out.println(query);
 
@@ -65,6 +68,9 @@ public class GoogolController {
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
         }
+
+        // Envie a mensagem para os clientes conectados ao tópico "/topic/admin"
+        messagingTemplate.convertAndSend("/topic/admin", new Mensagem(convertToJSON(searchModule.getStringMenu())));
 
         return "search";
     }
@@ -136,15 +142,16 @@ public class GoogolController {
     public String IndexHackersNews(Model model) {
         List<String> results = new ArrayList<String>();
 
-        if (results.isEmpty() || results == null) {
-            model.addAttribute("results", "Erro a ir buscar os top stories: A lista vem vazia ou esta null");
-            return "search";
-        }
-
         model.addAttribute("results", "A indexar os top stories do Hacker News");
 
         try {
             results = hackerNewsAPI.getTopStories();
+
+            if (results.isEmpty() || results == null) {
+                model.addAttribute("results", "Erro a ir buscar os top stories: A lista vem vazia ou esta null");
+                return "search";
+            }
+
             for (String url : results) {
                 boolean searching = true;
                 while (searching) {
@@ -191,9 +198,9 @@ public class GoogolController {
     @GetMapping("/register")
     public String register(Model model) {
         String username = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
-            .getParameter("username");
+                .getParameter("username");
         String password = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
-            .getParameter("password");
+                .getParameter("password");
 
         if (username == null || password == null) {
             return "register";
@@ -222,8 +229,8 @@ public class GoogolController {
         }
 
         try (FileWriter fileWriter = new FileWriter(file, true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            PrintWriter out = new PrintWriter(bufferedWriter)) {
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                PrintWriter out = new PrintWriter(bufferedWriter)) {
             out.println(username + ";" + password);
         } catch (IOException e) {
             System.out.println("Error writing to login file: " + e.getMessage());
@@ -235,9 +242,9 @@ public class GoogolController {
     @GetMapping("/login")
     public String processLogin(Model model) {
         String username = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
-            .getParameter("username");
+                .getParameter("username");
         String password = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
-            .getParameter("password");
+                .getParameter("password");
 
         if (username == null || password == null) {
             return "login";
