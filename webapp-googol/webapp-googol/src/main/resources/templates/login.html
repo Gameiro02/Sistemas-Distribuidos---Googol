@@ -1,82 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>GOOGOL</title>
+    <title>GOOGOL - Login</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
+        /* Estilos CSS da página anterior */
+
+        html,
         body {
-            background-color: #f1f1f1;
-            font-family: 'Open Sans', sans-serif;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 40px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-top: 100px;
-        }
-
-        .container h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="password"] {
+            font-family: raleway, sans-serif;
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            height: 100%;
+            padding: 0;
+            margin: 0;
         }
-        .form-group button {
-            width: 120px;
-            padding: 10px;
-            font-size: 16px;
-            background-color: #4CAF50;
+
+        body {
+            display: flex;
+            background-color: #1a1e23;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        h1 {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-weight: bold;
             color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 0 auto;
-            display: block;
+            font-size: 40px;
+            margin: 0;
         }
-        
+
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            width: 80%;
+        }
+
+        .form-container h2 {
+            color: #fff;
+            font-size: 24px;
+            margin-top: 0;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="password"],
+        .form-container button {
+            display: block;
+            width: 80%;
+            margin: 0 auto;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #1a1e23;
+        }
+
+        .form-container button {
+            background-color: #fff;
+            color: #1a1e23;
+            font-weight: bold;
+            cursor: pointer;
+            width: 40%;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .form-container p {
+            color: #fff;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .form-container a {
+            color: hsl(19, 90%, 52%);
+            text-decoration: none;
+        }
+
+        .form-container a:hover {
+            text-decoration: underline;
+        }
+
+        .animated-word {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            size: 100px;
+        }
+
+        .letter {
+            transition: 0.4s;
+            transform: translateX(0);
+            cursor: grab;
+            color: #fff;
+        }
+
+        .letter:hover {
+            transform: translateY(-1rem);
+            background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
+            background-clip: border-box;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h2>GOOGOL</h2>
-        <form>
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <button type="submit">Login</button>
-            </div>
-        </form>
-    </div>
-</body>
+    <h1>
+        <div class="animated-word">
+            <div class="letter">G</div>
+            <div class="letter">o</div>
+            <div class="letter">o</div>
+            <div class="letter">g</div>
+            <div class="letter">o</div>
+            <div class="letter">l</div>
+        </div>
+    </h1>
+    <div class="form-container">
+    <h2>Olá de Novo!</h2>
+    <form>  
+        <div class="form-group">
+            <input type="text" placeholder="Username" name="username" required>
+        </div>
+        <div class="form-group">
+            <input type="password" placeholder="Password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="http://localhost:8080/register">Register</a></p>
+</div>
 
+</body>
 </html>
