@@ -1,36 +1,16 @@
 package com.example.webappgoogol;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.HtmlUtils;
-
-import java.util.*;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.io.*;
-import java.net.MalformedURLException;
 
 import com.example.webappgoogol.SearchModule.SearchModuleInterface;
 import com.example.webappgoogol.HackerNewsAPI.HackerNewsAPI;
@@ -40,8 +20,6 @@ public class GoogolController {
     private SearchModuleInterface searchModule;
     private HackerNewsAPI hackerNewsAPI;
     
-    private boolean processingFinished = false;
-
     @Autowired
     public GoogolController(SearchModuleInterface searchModule) {
         this.searchModule = searchModule;
@@ -71,10 +49,6 @@ public class GoogolController {
             model.addAttribute("results", results);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
         }
 
         return "search";
@@ -95,10 +69,6 @@ public class GoogolController {
             model.addAttribute("results", message);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
         }
 
         return "indexNewUrl";
@@ -115,10 +85,6 @@ public class GoogolController {
             model.addAttribute("results", results);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
         }
 
         return "listPages";
@@ -147,7 +113,7 @@ public class GoogolController {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
-        
+
         return "IndexHackersByUsername";
     }
 
