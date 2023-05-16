@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,8 @@ import com.example.webappgoogol.HackerNewsAPI.HackerNewsAPI;
 public class GoogolController {
     private SearchModuleInterface searchModule;
     private HackerNewsAPI hackerNewsAPI;
+    
+    private boolean processingFinished = false;
 
     @Autowired
     public GoogolController(SearchModuleInterface searchModule) {
@@ -125,6 +128,7 @@ public class GoogolController {
     public String IndexHackersByUsername(
             @RequestParam(name = "username", required = false, defaultValue = "") String username, Model model) {
         List<String> results = new ArrayList<String>();
+
         try {
             results = hackerNewsAPI.getUserStories(username);
 
@@ -135,16 +139,15 @@ public class GoogolController {
 
             model.addAttribute("results", results);
             System.out.println("results = " + results);
+
             for (String url : results) {
                 searchModule.IndexarUmNovoUrl(url);
             }
+
         } catch (Exception e) {
-            System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            System.out.println("Error: " + e.getMessage());
         }
+        
         return "IndexHackersByUsername";
     }
 
@@ -170,19 +173,27 @@ public class GoogolController {
     public String IndexHackersNews(Model model) {
         List<String> results = new ArrayList<String>();
         model.addAttribute("results", "A indexar os top stories do Hacker News");
+
         try {
             results = hackerNewsAPI.getTopStories();
             for (String url : results) {
-                searchModule.IndexarUmNovoUrl(url);
+                boolean searching = true;
+                while (searching) {
+                    try {
+                        searchModule.IndexarUmNovoUrl(url);
+                        searching = false;
+                    } catch (Exception e) {
+                        searching = true;
+                    }
+                }
             }
         } catch (Exception e) {
-            System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            System.out.println("Error: " + e.getMessage());
+            model.addAttribute("results", "Ocorreu um erro ao indexar os top stories do Hacker News");
+            return "error";
         }
-        model.addAttribute("results", "Correu tudo bem");
+
+        model.addAttribute("results", "Top stories do Hacker News indexados com sucesso!");
         return "search";
     }
 
