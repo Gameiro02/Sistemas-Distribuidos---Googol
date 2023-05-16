@@ -16,12 +16,6 @@ import org.json.simple.parser.JSONParser;
  * <p>
  */
 public class HackerNewsAPI {
-
-    public static void main(String[] args) {
-        HackerNewsAPI hackerNewsAPI = new HackerNewsAPI();
-        hackerNewsAPI.getUserStories("lg");
-    }
-
     /**
      * Returns a List object with the urls of the top stories in Hacker News.
      * <p>
@@ -33,12 +27,10 @@ public class HackerNewsAPI {
     public List<String> getTopStories() {
 
         List<String> urlList = new ArrayList<String>(); // List of Strings containing the urls of the top stories
-
         System.out.println("Getting top stories...");
 
         try {
-            URL url = new URL("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"); // URL that returns
-                                                                                                     // the top stories
+            URL url = new URL("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"); // URL that returns the top stories
 
             // Open the connection
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -85,20 +77,11 @@ public class HackerNewsAPI {
      */
     public List<String> getUserStories(String username) {
 
-        List<String> userStoryUrls = new ArrayList<String>(); // List of Strings containing the urls of the stories of
-                                                              // the user
-
+        List<String> userStoryUrls = new ArrayList<String>(); // List of Strings containing the urls of the stories of the user
         System.out.println("Getting @" + username + " top stories...");
 
         try {
-            URL url = new URL("https://hacker-news.firebaseio.com/v0/user/" + username + ".json?print=pretty"); // URL
-                                                                                                                // that
-                                                                                                                // returns
-                                                                                                                // the
-                                                                                                                // stories
-                                                                                                                // of
-                                                                                                                // the
-                                                                                                                // user
+            URL url = new URL("https://hacker-news.firebaseio.com/v0/user/" + username + ".json?print=pretty"); // URL that returns the stories of the user
 
             // Open the connection
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -173,12 +156,7 @@ public class HackerNewsAPI {
 
             Thread t = new Thread(() -> {
                 try {
-                    URL story = new URL(
-                            "https://hacker-news.firebaseio.com/v0/item/" + contentList[index] + ".json?print=pretty"); // URL
-                                                                                                                        // that
-                                                                                                                        // returns
-                                                                                                                        // the
-                                                                                                                        // story
+                    URL story = new URL("https://hacker-news.firebaseio.com/v0/item/" + contentList[index] + ".json?print=pretty"); // URL that returns the story
 
                     // Open the connection
                     HttpURLConnection storyCon = (HttpURLConnection) story.openConnection();
