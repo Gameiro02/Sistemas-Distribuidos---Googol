@@ -198,6 +198,7 @@ public class GoogolController {
         String s = convertToJSON(searchModule.getStringMenu());
 
         printJSON(s);
+        System.out.println("aa");
 
         return new Mensagem(s);
     }
@@ -255,7 +256,7 @@ public class GoogolController {
 
         return "redirect:/login";
     }
-    
+
     @GetMapping("/socketsss")
     public String socketsss() {
         return "seila";
@@ -289,7 +290,7 @@ public class GoogolController {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] parts = line.split(";");
-                
+
                 if (parts[0].equals(username) && parts[1].equals(password)) {
                     System.out.println("Login successful!");
                     userLogged = true;
@@ -411,9 +412,13 @@ public class GoogolController {
     }
 
     @GetMapping("getSearchResults/{query}")
-    public String getSearchResults(Model model, @PathVariable String query, @RequestParam(defaultValue = "0") int page) throws Exception {
+    public String getSearchResults(Model model, @PathVariable String query, @RequestParam(defaultValue = "0") int page)
+            throws Exception {
         List<String> strings = new ArrayList<>();
         List<String> aux = searchModule.searchForWords(query);
+
+        // Envie a mensagem para os clientes conectados ao tópico "/topic/admin"
+        messagingTemplate.convertAndSend("/topic/admin", new Mensagem(convertToJSON(searchModule.getStringMenu())));
 
         if (aux.size() == 0) {
             model.addAttribute("results", "Nenhum resultado encontrado!");
