@@ -66,6 +66,9 @@ public class GoogolController {
             return "search";
         }
 
+        // Envie a mensagem para os clientes conectados ao tópico "/topic/admin"
+        messagingTemplate.convertAndSend("/topic/admin", new Mensagem(convertToJSON(searchModule.getStringMenu())));
+
         try {
             List<String> results = searchModule.searchForWords(query);
             model.addAttribute("results", results);
@@ -73,8 +76,6 @@ public class GoogolController {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
         }
 
-        // Envie a mensagem para os clientes conectados ao tópico "/topic/admin"
-        messagingTemplate.convertAndSend("/topic/admin", new Mensagem(convertToJSON(searchModule.getStringMenu())));
         return "redirect:/getSearchResults/" + query;
     }
 
@@ -413,6 +414,11 @@ public class GoogolController {
     public String getSearchResults(Model model, @PathVariable String query, @RequestParam(defaultValue = "0") int page) throws Exception {
         List<String> strings = new ArrayList<>();
         List<String> aux = searchModule.searchForWords(query);
+
+        if (aux.size() == 0) {
+            model.addAttribute("results", "Nenhum resultado encontrado!");
+            return "getSearchResults";
+        }
 
         int startIndex = page * 10;
         int endIndex = Math.min(startIndex + 10, aux.size());
