@@ -32,6 +32,9 @@ public class GoogolController {
     private SearchModuleInterface searchModule;
     private HackerNewsAPI hackerNewsAPI;
 
+    private boolean userLogged = false;
+    private String username;
+
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
@@ -97,6 +100,10 @@ public class GoogolController {
 
     @GetMapping("/listPages")
     public String listPages(@RequestParam(name = "url", required = false, defaultValue = "") String url, Model model) {
+
+        if (!this.userLogged) {
+            return "login";
+        }
 
         System.out.println("url to list = " + url);
 
@@ -182,11 +189,6 @@ public class GoogolController {
         return "search";
     }
 
-    @GetMapping("/socketsss")
-    public String socketsss() {
-        return "seila";
-    }
-
     @MessageMapping("/hello")
     @SendTo("/topic/admin")
     public Mensagem greeting() throws Exception {
@@ -206,6 +208,11 @@ public class GoogolController {
 
     @GetMapping("/register")
     public String register(Model model) {
+
+        if (this.userLogged) {
+            return "redirect:/";
+        }
+
         String username = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
                 .getParameter("username");
         String password = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
@@ -245,11 +252,21 @@ public class GoogolController {
             System.out.println("Error writing to login file: " + e.getMessage());
         }
 
-        return "register";
+        return "redirect:/login";
+    }
+    
+    @GetMapping("/socketsss")
+    public String socketsss() {
+        return "seila";
     }
 
     @GetMapping("/login")
     public String processLogin(Model model) {
+
+        if (this.userLogged) {
+            return "redirect:/";
+        }
+
         String username = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
                 .getParameter("username");
         String password = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
@@ -271,8 +288,11 @@ public class GoogolController {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] parts = line.split(";");
+                
                 if (parts[0].equals(username) && parts[1].equals(password)) {
                     System.out.println("Login successful!");
+                    userLogged = true;
+                    this.username = username;
                     return "redirect:/search";
                 }
             }
@@ -282,7 +302,13 @@ public class GoogolController {
         }
 
         System.out.println("Login failed!");
-        return "redirect:/search";
+        return "redirect:/login";
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        this.userLogged = false;
+        return "redirect:/login";
     }
 
     public static void printJSON(String json) {
