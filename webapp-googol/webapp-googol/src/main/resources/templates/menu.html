@@ -32,7 +32,7 @@
     }
 
     #menu-h {
-      background-color: 1a1e23;
+      background-color: #1a1e23;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -64,7 +64,6 @@
 
     #menu-h ul li a:hover {
       background-color: hsl(19, 90%, 52%);
-
     }
 
     .animated-word {
@@ -87,16 +86,45 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
+    .LogReg {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 30px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin-right: 30px;
+    }
+
+    .login-button,
+    .register-button {
+      color: #FFF;
+      padding: 10px 20px;
+      display: inline-block;
+      text-decoration: none;
+      transition: background .4s;
+      background-color: hsl(19, 90%, 52%);
+      margin-left: 10px;
+    }
+
+    .login-button:hover,
+    .register-button:hover {
+      background-color: hsl(19, 70%, 42%);
+    }
   </style>
 </head>
 
 <body>
   <h1>
     <div class="animated-word">
-      <div class="letter">M</div>
-      <div class="letter">e</div>
-      <div class="letter">n</div>
-      <div class="letter">u</div>
+        <div class="letter">G</div>
+        <div class="letter">o</div>
+        <div class="letter">o</div>
+        <div class="letter">g</div>
+        <div class="letter">o</div>
+        <div class="letter">l</div>
     </div>
   </h1>
 
@@ -110,6 +138,12 @@
       <li><a href="/IndexHackersByUsername">Index Hackers By Username</a></li>
     </ul>
   </nav>
+  <div class="LogReg">
+    <a href="/login" class="login-button">Login</a>
+    <a href="/register" class="register-button">Register</a>
+    <a href="/menu" class="register-button">Logout</a>
+  </div>
+  
 </body>
 
 </html>
