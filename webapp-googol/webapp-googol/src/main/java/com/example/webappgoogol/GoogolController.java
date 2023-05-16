@@ -123,6 +123,15 @@ public class GoogolController {
             System.out.println("results = " + results);
 
             for (String url : results) {
+                boolean searching = true;
+                while (searching) {
+                    try {
+                        searchModule.IndexarUmNovoUrl(url);
+                        searching = false;
+                    } catch (Exception e) {
+                        searching = true;
+                    }
+                }
                 searchModule.IndexarUmNovoUrl(url);
             }
 
@@ -137,15 +146,16 @@ public class GoogolController {
     public String IndexHackersNews(Model model) {
         List<String> results = new ArrayList<String>();
 
-        if (results.isEmpty() || results == null) {
-            model.addAttribute("results", "Erro a ir buscar os top stories: A lista vem vazia ou esta null");
-            return "search";
-        }
-
         model.addAttribute("results", "A indexar os top stories do Hacker News");
 
         try {
             results = hackerNewsAPI.getTopStories();
+
+            if (results.isEmpty() || results == null) {
+                model.addAttribute("results", "Erro a ir buscar os top stories: A lista vem vazia ou esta null");
+                return "search";
+            }
+
             for (String url : results) {
                 boolean searching = true;
                 while (searching) {
