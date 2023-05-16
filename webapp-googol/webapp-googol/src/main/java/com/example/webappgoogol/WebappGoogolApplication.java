@@ -22,7 +22,10 @@ public class WebappGoogolApplication {
 	public SearchModuleInterface searchModule() throws Exception {
 		SearchModuleInterface searchModule = null;
 		try {
+			/* TUDO LOCAL */
 			searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
+
+			/* RMI PC LOBO */
 			// Registry registry = LocateRegistry.getRegistry("192.168.173.101", 1099);
 			// searchModule = (SearchModuleInterface) registry.lookup("SearchModule");
 		} catch (Exception e) {
