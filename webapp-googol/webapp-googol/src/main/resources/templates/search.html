@@ -1,22 +1,168 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Search Engine</title>
+    <title>GOOGOL</title>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="\SearchEngine.css">
+
+    <style>
+
+        h1 {
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 40px;
+        }
+
+        html, body{
+        font-family: raleway, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        }
+
+        body{
+            display: flex;
+            background-color: #1a1e23;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        .search {
+            margin-left: 10px;
+        }
+
+        .src-box{
+            font-size: 20px;
+            border: solid .25em #fff;
+            display: inline-block;
+            position: relative;
+            border-radius: 2.5em;
+
+            /* Margin to the left of 10px */
+            margin-left: 10px;
+        }
+
+        .src-box input[type=text]{
+            font-family: inherit;
+            font-weight: bold;
+            color: #fff;
+            width: 2.5em;
+            height: 2.5em;
+            background-color: transparent;
+            border: none;
+            box-sizing: border-box;
+            border-radius: 2.5em;
+            transition: width 800ms cubic-bezier(.68, -.55, .27, 1.55) 150ms;
+        }
+
+        .src-box input[type=text]:focus{
+            outline: none;
+        }
+
+        .src-box input[type=text]:focus, .src-box input[type=text]:not(:placeholder-shown){
+            width: 18em;
+            transition: width 800ms cubic-bezier(.68, -.55, .27, 1.55);
+        }
+
+        .src-box input[type=text]:focus + button[type=reset], .src-box input[type=text]:not(:placeholder-shown) + button[type=reset]{
+            transform: rotate(-45deg) translateY(0);
+            transition: transform 150ms ease-out 800ms;
+        }
+
+        .src-box input[type=text]:focus + button[type=reset]::after, .src-box input[type=text]:not(:placeholder-shown) + button[type=reset]::after{
+            opacity: 1;
+            transition: top 150ms ease-out 950ms, right 150ms ease-out 950ms, opacity 150ms ease-out 950ms;
+        }
+
+        .src-box button[type=reset]{
+            background-color: transparent;
+            width: 1.4em;
+            height: 1.4em;
+            border: 0;
+            padding: 0;
+            outline: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: .55em;
+            right: .55em;
+            transform: rotate(-45deg) translateY(2.2em);
+            transition: transform 150ms ease-out 150ms;
+        }
+
+        .src-box button[type=reset]::before, .src-box button[type=reset]::after{
+            content: "";
+            background-color: #fff;
+            width: .3em;
+            height: 1.4em;
+            border-radius: 10px;
+            position: absolute;
+        }
+
+        .src-box button[type=reset]::after{
+            transform: rotate(90deg);
+            opacity: 0;
+            transition: transform 150ms ease-out, opacity 150ms ease-out;
+        }
+
+
+        .animated-word {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+
+        .letter {
+        transition: 0.4s;
+        transform: translateX(0);
+        cursor: grab;
+        color: #fff;
+        }
+
+        .letter:hover {
+        transform: translatey(-1rem);
+        background: -webkit-linear-gradient(120deg, hsl(19,90%,52%), hsl(56,100%,50%));
+        background-clip: border-box;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        }
+
+        
+    </style>
 </head>
 
 <body>
-    <h1>Search Engine</h1>
-    <form action="/search" method="get">
-        <label for="search-input">Search:</label>
-        <input type="text" id="search-input" name="query" required>
-        <button type="submit">Search</button>
+    <h1>
+        <div class="animated-word">
+            <div class="letter">G</div>
+            <div class="letter">o</div>
+            <div class="letter">o</div>
+            <div class="letter">g</div>
+            <div class="letter">o</div>
+            <div class="letter">l</div>
+        </div>
+    </h1>
 
-        <p th:text="'Results for query: ' + ${results}"></p>
-    </form>
+    <div class="src-box">
+        <input class="search" type="text" placeholder="  ">
+        <button type="reset"></button>
+    </div>
+
+    <!-- when click enter e searchs -->
+    <script>
+        document.querySelector('.src-box input[type=text]').addEventListener('keyup', function (e) {
+            if (e.keyCode == 13) {
+                window.location.href = 'http://localhost:8080/search?search=' + document.querySelector('.src-box input[type=text]').value;
+            }
+        });
+    </script>
 </body>
 
 </html>

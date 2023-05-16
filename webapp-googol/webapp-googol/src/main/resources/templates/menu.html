@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MENU</title>
+
+  <style>    
+    * {
+        margin: 0 auto;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: raleway, sans-serif;
+    }
+
+    h1{
+      text-align: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 40px;
+      margin-bottom: 30px;
+    }
+
+    body{
+      display: flex;
+      background-color: #1a1e23;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #menu-h{
+        background-color: rgb(37, 37, 39);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+        height: 100%;
+    }
+
+    #menu-h ul {
+        max-width: 1000px;
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center; 
+    }
+
+    #menu-h ul li {
+        display: vertical;
+    }
+
+    #menu-h ul li a {
+        color: #FFF;
+        padding: 20px;
+        display: inline-block;
+        text-decoration: none;
+        transition: background .4s;
+    }
+
+    #menu-h ul li a:hover {
+        background-color:hsl(19,90%,52%);
+
+    }
+
+    .animated-word {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .letter {
+    transition: 0.4s;
+    transform: translateX(0);
+    cursor: grab;
+    color: #fff;
+    }
+
+    .letter:hover {
+    transform: translatey(-1rem);
+    background: -webkit-linear-gradient(120deg, hsl(19,90%,52%), hsl(56,100%,50%));
+    background-clip: border-box;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    }
+ 
+ </style>
+</head>
+
+<body>
+  <h1>
+    <div class="animated-word">
+      <div class="letter">M</div>
+      <div class="letter">e</div>
+      <div class="letter">n</div>
+      <div class="letter">u</div>
+    </div>
+  </h1>
+
+  <nav id="menu-h">
+    <ul>
+      <li><a href="/search">Search</a></li>
+      <li><a href="/indexNewUrl">Index New Url</a></li>
+      <li><a href="/listPages">List Pages</a></li>
+      <li><a href="/admin">Admin</a></li>
+      <li><a href="/socketsss">Sockets</a></li>
+      <li><a href="/IndexHackersNews">Index Hackers News</a></li>
+      <li><a href="/IndexHackersByUsername">Index Hackers By Username</a></li>
+    </ul>
+  </nav>
+</body>
+
+</html>
