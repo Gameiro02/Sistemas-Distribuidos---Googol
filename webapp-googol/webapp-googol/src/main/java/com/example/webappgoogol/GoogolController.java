@@ -63,6 +63,10 @@ public class GoogolController {
 
         System.out.println(query);
 
+        if (query.equals("")) {
+            return "search";
+        }
+
         try {
             List<String> results = searchModule.searchForWords(query);
             model.addAttribute("results", results);
