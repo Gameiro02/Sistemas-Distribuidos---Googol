@@ -62,12 +62,9 @@ public class GoogolController {
     public String search(@RequestParam(name = "query", required = false, defaultValue = "") String query,
             Model model) throws Exception {
 
-        System.out.println(query);
-
         if (query.equals("")) {
             return "search";
         }
-        System.out.println("query = " + query);
 
         try {
             List<String> results = searchModule.searchForWords(query);
@@ -78,7 +75,7 @@ public class GoogolController {
 
         // Envie a mensagem para os clientes conectados ao tópico "/topic/admin"
         messagingTemplate.convertAndSend("/topic/admin", new Mensagem(convertToJSON(searchModule.getStringMenu())));
-        return "redirect:/api/getSearchResults/" + query;
+        return "redirect:/getSearchResults/" + query;
     }
 
     @GetMapping("/indexNewUrl")
@@ -425,7 +422,12 @@ public class GoogolController {
             strings.add(s);
         }
 
-        model.addAttribute("results", strings);
-        return "results";
+        String resultsString = String.join(",", strings);
+
+        resultsString = resultsString.replace(",", "<br><br>");
+        resultsString = resultsString.replace(";", "<br>");
+
+        model.addAttribute("results", resultsString);
+        return "getSearchResults";
     }
 }
