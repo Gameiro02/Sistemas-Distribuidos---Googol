@@ -55,10 +55,6 @@ public class GoogolController {
             model.addAttribute("results", results);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
         }
 
         return "search";
@@ -79,10 +75,6 @@ public class GoogolController {
             model.addAttribute("results", message);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
         }
 
         return "indexNewUrl";
@@ -99,10 +91,6 @@ public class GoogolController {
             model.addAttribute("results", results);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
         }
 
         return "listPages";
@@ -112,6 +100,7 @@ public class GoogolController {
     public String IndexHackersByUsername(
             @RequestParam(name = "username", required = false, defaultValue = "") String username, Model model) {
         List<String> results = new ArrayList<String>();
+
         try {
             results = hackerNewsAPI.getUserStories(username);
 
@@ -122,16 +111,15 @@ public class GoogolController {
 
             model.addAttribute("results", results);
             System.out.println("results = " + results);
+
             for (String url : results) {
                 searchModule.IndexarUmNovoUrl(url);
             }
+
         } catch (Exception e) {
-            System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            System.out.println("Error: " + e.getMessage());
         }
+
         return "IndexHackersByUsername";
     }
 
@@ -145,19 +133,27 @@ public class GoogolController {
         }
 
         model.addAttribute("results", "A indexar os top stories do Hacker News");
+
         try {
             results = hackerNewsAPI.getTopStories();
             for (String url : results) {
-                searchModule.IndexarUmNovoUrl(url);
+                boolean searching = true;
+                while (searching) {
+                    try {
+                        searchModule.IndexarUmNovoUrl(url);
+                        searching = false;
+                    } catch (Exception e) {
+                        searching = true;
+                    }
+                }
             }
         } catch (Exception e) {
-            System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            try {
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            System.out.println("Error: " + e.getMessage());
+            model.addAttribute("results", "Ocorreu um erro ao indexar os top stories do Hacker News");
+            return "error";
         }
-        model.addAttribute("results", "Correu tudo bem");
+
+        model.addAttribute("results", "Top stories do Hacker News indexados com sucesso!");
         return "search";
     }
 
