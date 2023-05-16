@@ -1,6 +1,8 @@
 package com.example.webappgoogol;
 
 import java.rmi.Naming;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +21,10 @@ public class WebappGoogolApplication {
 	public SearchModuleInterface searchModule() throws Exception {
 		SearchModuleInterface searchModule = null;
 		try {
-			searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
+			// searchModule = (SearchModuleInterface)
+			// Naming.lookup("rmi://localhost/SearchModule");
+			Registry registry = LocateRegistry.getRegistry("192.168.1.79", 1099);
+			searchModule = (SearchModuleInterface) registry.lookup("SearchModule");
 		} catch (Exception e) {
 			System.out.println("Erro ao conectar com o servidor, tentando novamente em 3 segundos");
 			Thread.sleep(3000);
