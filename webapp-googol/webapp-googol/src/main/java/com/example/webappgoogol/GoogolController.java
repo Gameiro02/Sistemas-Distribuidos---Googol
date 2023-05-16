@@ -1,37 +1,20 @@
 package com.example.webappgoogol;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.util.HtmlUtils;
-
-import java.util.*;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.io.*;
-import java.net.MalformedURLException;
-
 import com.example.webappgoogol.SearchModule.SearchModuleInterface;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.example.webappgoogol.HackerNewsAPI.HackerNewsAPI;
 
 @Controller
@@ -187,7 +170,12 @@ public class GoogolController {
     @SendTo("/topic/admin")
     public Mensagem greeting() throws Exception {
         Thread.sleep(1000); // simulated delay
-        return new Mensagem(searchModule.getStringMenu());
+
+        String s = convertToJSON(searchModule.getStringMenu());
+
+        printJSON(s);
+
+        return new Mensagem(s);
     }
 
     @GetMapping("/")
@@ -198,6 +186,86 @@ public class GoogolController {
     @GetMapping("/teste")
     public String teste() {
         return "teste";
+    }
+
+    public static void printJSON(String json) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Object jsonObject = objectMapper.readValue(json, Object.class);
+            String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
+            System.out.println(prettyJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String convertToJSON(String input) {
+        List<String> downloaders = new ArrayList<>();
+        List<String> barrels = new ArrayList<>();
+        List<String> searches = new ArrayList<>();
+
+        // Parse the input string and extract the relevant information
+        String[] lines = input.split("\n");
+        int state = 0; // 0 - Downloaders, 1 - Barrels, 2 - Most Frequent Searches
+
+        for (String line : lines) {
+            if (line.startsWith("------- Downloaders -------")) {
+                state = 0;
+            } else if (line.startsWith("------- Barrels -------")) {
+                state = 1;
+            } else if (line.startsWith("------- Most Frequent Searches -------")) {
+                state = 2;
+            } else if (!line.isEmpty()) {
+                switch (state) {
+                    case 0:
+                        downloaders.add(line);
+                        break;
+                    case 1:
+                        barrels.add(line);
+                        break;
+                    case 2:
+                        searches.add(line);
+                        break;
+                }
+            }
+        }
+
+        // Create the JSON object using Jackson
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode json = objectMapper.createObjectNode();
+
+        // Add the downloader information
+        json.put("num_downloaders", downloaders.size());
+        ArrayNode downloaderStates = objectMapper.createArrayNode();
+        for (String downloader : downloaders) {
+            downloaderStates.add(downloader);
+        }
+        json.set("downloader_states", downloaderStates);
+
+        // Add the barrel information
+        json.put("num_barrels", barrels.size());
+        ArrayNode barrelStates = objectMapper.createArrayNode();
+        for (String barrel : barrels) {
+            barrelStates.add(barrel);
+        }
+        json.set("barrel_states", barrelStates);
+
+        // Add the search information
+        json.put("num_searches", searches.size());
+        ArrayNode searchStates = objectMapper.createArrayNode();
+        for (String search : searches) {
+            searchStates.add(search);
+        }
+        json.set("search_states", searchStates);
+
+        // Convert the JSON object to a string
+        try {
+            return objectMapper.writeValueAsString(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }
