@@ -6,6 +6,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import com.example.webappgoogol.Configuration;
@@ -213,9 +214,10 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
     }
 
     public static void main(String[] args) throws IOException, NotBoundException {
+        System.setProperty("java.rmi.server.hostname", "192.168.1.79");
+        Registry registry = LocateRegistry.createRegistry(1099);
         SearchModule searchModule = new SearchModule();
-        LocateRegistry.createRegistry(1099);
-        Naming.rebind("SearchModule", searchModule);
+        registry.rebind("SearchModule", searchModule);
 
         for (int i = 1; i <= Configuration.NUM_BARRELS; i++) {
             Barrel b = new Barrel(i);
