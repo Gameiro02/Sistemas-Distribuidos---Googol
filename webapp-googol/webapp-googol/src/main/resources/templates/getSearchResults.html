@@ -45,15 +45,42 @@
       margin-bottom: 20px;
     }
 
-    div {
+    .results-container {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .results {
       color: #fff;
       font-size: 16px;
+      line-height: 1.4;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .result-title {
+      color: hsl(19, 90%, 52%);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .result-description {
+      color: hsl(19, 90%, 52%);
+      margin-bottom: 20px;
+    }
+
+    .result-link {
+      color: hsl(19, 70%, 42%);
+      text-decoration: underline;
     }
   </style>
 </head>
 
+
 <body>
 
+  <button onclick="decrementPagina()">Previous</button>
+  <button onclick="incrementPagina()">Next</button>
   <button onclick="decrementPagina()">Previous</button>
   <button onclick="incrementPagina()">Next</button>
 
@@ -65,7 +92,26 @@
       // Extract the value of the 'pagina' parameter
       var regex = /page=(\d+)/;
       var match = currentURL.match(regex);
+  <script>
+    function incrementPagina() {
+      // Get the current URL
+      var currentURL = window.location.href;
 
+      // Extract the value of the 'pagina' parameter
+      var regex = /page=(\d+)/;
+      var match = currentURL.match(regex);
+
+      var currentPage = match ? parseInt(match[1]) : 0;
+
+      // Increment the 'pagina' parameter value
+      var newPage = currentPage + 1;
+
+      // Construct the new URL with the updated 'pagina' parameter
+      var newURL = currentURL.replace(regex, "page=" + newPage);
+
+      // Navigate to the new URL
+      window.location.href = newURL;
+    }
       var currentPage = match ? parseInt(match[1]) : 0;
 
       // Increment the 'pagina' parameter value
@@ -98,8 +144,13 @@
     }
   </script>
 
-  <h1>Search Results</h1>
-  <div th:utext="${results}"></div>
+<h1>Search Results</h1>
+<div class="results-container">
+  <div class="results" th:utext="${results}">
+    <!-- Result items here -->
+  </div>
+</div>
 </body>
 
 </html>
+    
