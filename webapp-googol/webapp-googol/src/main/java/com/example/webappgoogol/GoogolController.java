@@ -22,6 +22,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.HtmlUtils;
 
 import com.example.webappgoogol.SearchModule.SearchModuleInterface;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.example.webappgoogol.HackerNewsAPI.HackerNewsAPI;
 
 @Controller
@@ -51,6 +55,10 @@ public class GoogolController {
             Model model) {
 
         System.out.println(query);
+
+        if (query.equals("")) {
+            return "search";
+        }
 
         try {
             List<String> results = searchModule.searchForWords(query);
@@ -125,27 +133,15 @@ public class GoogolController {
         return "IndexHackersByUsername";
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "admin";
-    }
-
-    // /admin = /topic
-    @MessageMapping("/update")
-    @SendTo("/admin/updates")
-    public AdminInfo onMessage(AdminInfo adminInfo) {
-        System.out.println("AdminInfo: " + adminInfo);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-        return new AdminInfo(HtmlUtils.htmlEscape(adminInfo.content()));
-    }
-
     @GetMapping("/IndexHackersNews")
     public String IndexHackersNews(Model model) {
         List<String> results = new ArrayList<String>();
+
+        if (results.isEmpty() || results == null) {
+            model.addAttribute("results", "Erro a ir buscar os top stories: A lista vem vazia ou esta null");
+            return "search";
+        }
+
         model.addAttribute("results", "A indexar os top stories do Hacker News");
 
         try {
@@ -180,12 +176,17 @@ public class GoogolController {
     @SendTo("/topic/admin")
     public Mensagem greeting() throws Exception {
         Thread.sleep(1000); // simulated delay
-        return new Mensagem(searchModule.getStringMenu());
+
+        String s = convertToJSON(searchModule.getStringMenu());
+
+        printJSON(s);
+
+        return new Mensagem(s);
     }
 
     @GetMapping("/")
     public String root() {
-        return "search";
+        return "menu";
     }
 
     @GetMapping("/register")
@@ -267,6 +268,86 @@ public class GoogolController {
 
         System.out.println("Login failed!");
         return "redirect:/search";
+    }
+
+    public static void printJSON(String json) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Object jsonObject = objectMapper.readValue(json, Object.class);
+            String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
+            System.out.println(prettyJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String convertToJSON(String input) {
+        List<String> downloaders = new ArrayList<>();
+        List<String> barrels = new ArrayList<>();
+        List<String> searches = new ArrayList<>();
+
+        // Parse the input string and extract the relevant information
+        String[] lines = input.split("\n");
+        int state = 0; // 0 - Downloaders, 1 - Barrels, 2 - Most Frequent Searches
+
+        for (String line : lines) {
+            if (line.startsWith("------- Downloaders -------")) {
+                state = 0;
+            } else if (line.startsWith("------- Barrels -------")) {
+                state = 1;
+            } else if (line.startsWith("------- Most Frequent Searches -------")) {
+                state = 2;
+            } else if (!line.isEmpty()) {
+                switch (state) {
+                    case 0:
+                        downloaders.add(line);
+                        break;
+                    case 1:
+                        barrels.add(line);
+                        break;
+                    case 2:
+                        searches.add(line);
+                        break;
+                }
+            }
+        }
+
+        // Create the JSON object using Jackson
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode json = objectMapper.createObjectNode();
+
+        // Add the downloader information
+        json.put("num_downloaders", downloaders.size());
+        ArrayNode downloaderStates = objectMapper.createArrayNode();
+        for (String downloader : downloaders) {
+            downloaderStates.add(downloader);
+        }
+        json.set("downloader_states", downloaderStates);
+
+        // Add the barrel information
+        json.put("num_barrels", barrels.size());
+        ArrayNode barrelStates = objectMapper.createArrayNode();
+        for (String barrel : barrels) {
+            barrelStates.add(barrel);
+        }
+        json.set("barrel_states", barrelStates);
+
+        // Add the search information
+        json.put("num_searches", searches.size());
+        ArrayNode searchStates = objectMapper.createArrayNode();
+        for (String search : searches) {
+            searchStates.add(search);
+        }
+        json.set("search_states", searchStates);
+
+        // Convert the JSON object to a string
+        try {
+            return objectMapper.writeValueAsString(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }

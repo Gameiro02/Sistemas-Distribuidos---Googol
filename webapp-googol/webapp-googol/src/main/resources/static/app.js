@@ -46,15 +46,21 @@ function formatMessage(message) {
     var lines = message.split('\n');
     var formattedMessage = "";
 
-    lines.forEach(function (line) {
-        if (line.includes("Downloader") || line.includes("Barrel") || line.includes("Search")) {
-            formattedMessage += "<strong>" + line + "</strong><br>";
-        } else {
-            formattedMessage += line + "<br>";
-        }
-    });
+    try {
+        var jsonObject = JSON.parse(message);
+        var formattedJSON = JSON.stringify(jsonObject, null, 2);
+        formattedMessage += "<pre>" + escapeHtml(formattedJSON) + "</pre>";
+    } catch (error) {
+        console.log("Failed to parse JSON:", error);
+    }
 
     return formattedMessage;
+}
+
+function escapeHtml(html) {
+    var div = document.createElement('div');
+    div.textContent = html;
+    return div.innerHTML;
 }
 
 $(function () {
