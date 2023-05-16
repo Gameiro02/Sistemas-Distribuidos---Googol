@@ -214,10 +214,11 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
     }
 
     public static void main(String[] args) throws IOException, NotBoundException {
-        System.setProperty("java.rmi.server.hostname", "192.168.173.101");
-        Registry registry = LocateRegistry.createRegistry(1099);
+        // System.setProperty("java.rmi.server.hostname", "192.168.1.79");
+        // Registry registry = LocateRegistry.createRegistry(1099);
         SearchModule searchModule = new SearchModule();
-        registry.rebind("SearchModule", searchModule);
+        LocateRegistry.createRegistry(1099);
+        Naming.rebind("SearchModule", searchModule);
 
         for (int i = 1; i <= Configuration.NUM_BARRELS; i++) {
             Barrel b = new Barrel(i);

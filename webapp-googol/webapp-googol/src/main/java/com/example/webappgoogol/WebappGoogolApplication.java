@@ -21,6 +21,8 @@ public class WebappGoogolApplication {
 		SearchModuleInterface searchModule = null;
 		try {
 			searchModule = (SearchModuleInterface) Naming.lookup("rmi://localhost/SearchModule");
+            // Registry registry = LocateRegistry.getRegistry("192.168.173.101", 1099);
+            // searchModule = (SearchModuleInterface) registry.lookup("SearchModule");
 		} catch (Exception e) {
 			System.out.println("Erro ao conectar com o servidor, tentando novamente em 3 segundos");
 			Thread.sleep(3000);
