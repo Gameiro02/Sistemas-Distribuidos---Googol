@@ -1,7 +1,14 @@
 package com.example.webappgoogol;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -10,6 +17,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.HtmlUtils;
+
 import com.example.webappgoogol.SearchModule.SearchModuleInterface;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -27,7 +38,6 @@ public class GoogolController {
         this.hackerNewsAPI = new HackerNewsAPI();
     }
 
-    // localhost:8080/greeting?name=Gonçalo&othername=Gameiro
     @GetMapping("/greeting")
     public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String name,
             @RequestParam(name = "othername", required = false, defaultValue = "Gameiro") String othername,
@@ -178,9 +188,85 @@ public class GoogolController {
         return "menu";
     }
 
-    @GetMapping("/teste")
-    public String teste() {
-        return "teste";
+    @GetMapping("/register")
+    public String register(Model model) {
+        String username = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
+            .getParameter("username");
+        String password = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
+            .getParameter("password");
+
+        if (username == null || password == null) {
+            return "register";
+        }
+
+        File file = new File("src\\main\\java\\com\\example\\webappgoogol\\login.txt");
+
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            System.out.println("Error creating login file: " + e.getMessage());
+        }
+
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(";");
+
+                if (parts[0].equals(username)) {
+                    model.addAttribute("results", "Username já existe!");
+                    return "register";
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error reading login file: " + e.getMessage());
+        }
+
+        try (FileWriter fileWriter = new FileWriter(file, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            PrintWriter out = new PrintWriter(bufferedWriter)) {
+            out.println(username + ";" + password);
+        } catch (IOException e) {
+            System.out.println("Error writing to login file: " + e.getMessage());
+        }
+
+        return "register";
+    }
+
+    @GetMapping("/login")
+    public String processLogin(Model model) {
+        String username = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
+            .getParameter("username");
+        String password = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
+            .getParameter("password");
+
+        if (username == null || password == null) {
+            return "login";
+        }
+
+        File file = new File("src\\main\\java\\com\\example\\webappgoogol\\login.txt");
+
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            System.out.println("Error creating login file: " + e.getMessage());
+        }
+
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(";");
+                if (parts[0].equals(username) && parts[1].equals(password)) {
+                    System.out.println("Login successful!");
+                    return "redirect:/search";
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        System.out.println("Login failed!");
+        return "redirect:/search";
     }
 
     public static void printJSON(String json) {
