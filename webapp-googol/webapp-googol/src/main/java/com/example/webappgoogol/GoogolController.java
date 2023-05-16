@@ -128,6 +128,15 @@ public class GoogolController {
             System.out.println("results = " + results);
 
             for (String url : results) {
+                boolean searching = true;
+                while (searching) {
+                    try {
+                        searchModule.IndexarUmNovoUrl(url);
+                        searching = false;
+                    } catch (Exception e) {
+                        searching = true;
+                    }
+                }
                 searchModule.IndexarUmNovoUrl(url);
             }
 
