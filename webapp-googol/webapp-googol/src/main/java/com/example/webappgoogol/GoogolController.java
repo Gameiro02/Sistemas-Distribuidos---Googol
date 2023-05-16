@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -37,6 +34,7 @@ public class GoogolController {
     private HackerNewsAPI hackerNewsAPI;
 
     private boolean userLogged = false;
+    private String username;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -203,7 +201,9 @@ public class GoogolController {
     }
 
     @GetMapping("/")
-    public String root() {
+    public String root(Model model) {
+        model.addAttribute("userLogged", this.userLogged);
+        model.addAttribute("username", this.username);
         return "menu";
     }
 
@@ -261,6 +261,12 @@ public class GoogolController {
         return "seila";
     }
 
+    @GetMapping("/logout")
+    public String logout() {
+        this.userLogged = false;
+        return "redirect:/";
+    }
+
     @GetMapping("/login")
     public String processLogin(Model model) {
 
@@ -292,8 +298,9 @@ public class GoogolController {
                 
                 if (parts[0].equals(username) && parts[1].equals(password)) {
                     System.out.println("Login successful!");
-                    userLogged = true;
-                    return "redirect:/search";
+                    this.userLogged = true;
+                    this.username = username;
+                    return "redirect:/";
                 }
             }
             scanner.close();
@@ -302,12 +309,6 @@ public class GoogolController {
         }
 
         System.out.println("Login failed!");
-        return "redirect:/login";
-    }
-
-    @GetMapping("/logout")
-    public String logout() {
-        this.userLogged = false;
         return "redirect:/login";
     }
 
