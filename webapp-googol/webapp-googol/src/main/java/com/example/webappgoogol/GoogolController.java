@@ -365,4 +365,23 @@ public class GoogolController {
         return null;
     }
 
+    @GetMapping("/results")
+    public String results(@RequestParam(name = "query", required = false, defaultValue = "") String query,
+            Model model) {
+
+        if (query.equals("")) {
+            return "search";
+        }
+
+        try {
+            List<String> results = searchModule.searchForWords(query);
+            model.addAttribute("results", results);
+        } catch (Exception e) {
+            System.out.println("Erro ao conectar com o servidor!!!!!!!");
+            e.printStackTrace();
+        }
+
+        return "results";
+    }
+
 }
