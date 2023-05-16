@@ -11,13 +11,17 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -33,7 +37,6 @@ public class GoogolController {
     private HackerNewsAPI hackerNewsAPI;
 
     private boolean userLogged = false;
-    private String username;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -64,6 +67,7 @@ public class GoogolController {
         if (query.equals("")) {
             return "search";
         }
+        System.out.println("query = " + query);
 
         try {
             List<String> results = searchModule.searchForWords(query);
@@ -74,8 +78,7 @@ public class GoogolController {
 
         // Envie a mensagem para os clientes conectados ao tópico "/topic/admin"
         messagingTemplate.convertAndSend("/topic/admin", new Mensagem(convertToJSON(searchModule.getStringMenu())));
-
-        return "search";
+        return "redirect:/api/getSearchResults/" + query;
     }
 
     @GetMapping("/indexNewUrl")
@@ -292,7 +295,6 @@ public class GoogolController {
                 if (parts[0].equals(username) && parts[1].equals(password)) {
                     System.out.println("Login successful!");
                     userLogged = true;
-                    this.username = username;
                     return "redirect:/search";
                 }
             }
@@ -410,4 +412,20 @@ public class GoogolController {
         return "results";
     }
 
+    @GetMapping("getSearchResults/{query}")
+    public String getSearchResults(Model model, @PathVariable String query, @RequestParam(defaultValue = "0") int page) throws Exception {
+        List<String> strings = new ArrayList<>();
+        List<String> aux = searchModule.searchForWords(query);
+
+        int startIndex = page * 10;
+        int endIndex = Math.min(startIndex + 10, aux.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            String s = aux.get(i);
+            strings.add(s);
+        }
+
+        model.addAttribute("results", strings);
+        return "results";
+    }
 }
