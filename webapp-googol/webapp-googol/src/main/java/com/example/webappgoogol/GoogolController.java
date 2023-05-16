@@ -152,27 +152,15 @@ public class GoogolController {
         return "IndexHackersByUsername";
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "admin";
-    }
-
-    // /admin = /topic
-    @MessageMapping("/update")
-    @SendTo("/admin/updates")
-    public AdminInfo onMessage(AdminInfo adminInfo) {
-        System.out.println("AdminInfo: " + adminInfo);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-        return new AdminInfo(HtmlUtils.htmlEscape(adminInfo.content()));
-    }
-
     @GetMapping("/IndexHackersNews")
     public String IndexHackersNews(Model model) {
         List<String> results = new ArrayList<String>();
+
+        if (results.isEmpty() || results == null) {
+            model.addAttribute("results", "Erro a ir buscar os top stories: A lista vem vazia ou esta null");
+            return "search";
+        }
+
         model.addAttribute("results", "A indexar os top stories do Hacker News");
         try {
             results = hackerNewsAPI.getTopStories();
@@ -204,7 +192,7 @@ public class GoogolController {
 
     @GetMapping("/")
     public String root() {
-        return "search";
+        return "menu";
     }
 
     @GetMapping("/teste")
