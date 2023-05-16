@@ -76,7 +76,7 @@ public class GoogolController {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
         }
 
-        return "redirect:/getSearchResults/" + query;
+        return "redirect:/getSearchResults/" + query + "?page=0";
     }
 
     @GetMapping("/indexNewUrl")
