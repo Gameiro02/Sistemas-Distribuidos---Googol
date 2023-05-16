@@ -89,7 +89,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            size: 100px;
         }
 
         .letter {
@@ -106,18 +105,30 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        .letterStatic {
+            transition: 0.4s;
+            transform: translateX(0);
+            cursor: grab;
+            color: #fff;
+        }
+
+        .letterStatic:hover {
+            background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
+            background-clip: border-box;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
     </style>
 </head>
 
 <body>
     <h1>
         <div class="animated-word">
-            <div class="letter">G</div>
-            <div class="letter">o</div>
-            <div class="letter">o</div>
-            <div class="letter">g</div>
-            <div class="letter">o</div>
-            <div class="letter">l</div>
+            <a href="/" style="text-decoration: none;">
+                <div class="letterStatic" style="position: absolute; top: 10px; left: 10px;">G</div>
+            </a>
         </div>
     </h1>
     <div class="form-container">

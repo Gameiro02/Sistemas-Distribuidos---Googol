@@ -101,7 +101,7 @@ public class GoogolController {
     public String listPages(@RequestParam(name = "url", required = false, defaultValue = "") String url, Model model) {
 
         if (!this.userLogged) {
-            return "login";
+            return "redirect:/login";
         }
 
         System.out.println("url to list = " + url);
