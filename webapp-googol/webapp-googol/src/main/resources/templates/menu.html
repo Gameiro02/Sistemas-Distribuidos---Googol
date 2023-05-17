@@ -130,12 +130,12 @@
 <body>
   <h1>
     <div class="animated-word">
-        <div class="letter">G</div>
-        <div class="letter">o</div>
-        <div class="letter">o</div>
-        <div class="letter">g</div>
-        <div class="letter">o</div>
-        <div class="letter">l</div>
+      <div class="letter">G</div>
+      <div class="letter">o</div>
+      <div class="letter">o</div>
+      <div class="letter">g</div>
+      <div class="letter">o</div>
+      <div class="letter">l</div>
     </div>
   </h1>
 
@@ -147,19 +147,23 @@
       <li><a href="/socketsss">AdminPage</a></li>
       <li><a href="/IndexHackersNews">Index Hackers News</a></li>
       <li><a href="/IndexHackersByUsername">Index Hackers By Username</a></li>
+      <li th:if="${hackerNewsBoolean}" style="background-color: #F35C16;">
+        <a style="color:#FFF" href="/">The top stories of
+          Hacker News have been
+          indexed</a>
+      </li>
     </ul>
-
-    <p th:text="${hackerNewsResult}">Boas pessoal</p>
 
   </nav>
   <div class="LogReg">
     <a th:unless="${userLogged}" href="/login" class="login-button">Login</a>
     <a th:unless="${userLogged}" href="/register" class="register-button">Register</a>
-    <span th:if="${userLogged}" style="font-size: 14px; color: #FFF; margin-right: 10px;">Logged in as <span th:text="${username}"></span></span>
+    <span th:if="${userLogged}" style="font-size: 14px; color: #478dcb; margin-right: 10px;">Logged in as <span
+        th:text="${username}"></span></span>
     <a th:if="${userLogged}" href="/logout" class="register-button">Logout</a>
   </div>
 
-  
+
 </body>
 
 </html>

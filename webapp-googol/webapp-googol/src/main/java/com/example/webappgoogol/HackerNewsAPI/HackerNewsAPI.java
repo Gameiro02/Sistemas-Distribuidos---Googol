@@ -30,7 +30,8 @@ public class HackerNewsAPI {
         System.out.println("Getting top stories...");
 
         try {
-            URL url = new URL("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"); // URL that returns the top stories
+            URL url = new URL("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"); // URL that returns
+                                                                                                     // the top stories
 
             // Open the connection
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -57,7 +58,7 @@ public class HackerNewsAPI {
                     contentList[contentList.length - 1].length() - 2);
 
             // Parse the JSON response
-            urlList = jsonParser(contentList);
+            urlList = jsonParser(contentList, false);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,11 +78,19 @@ public class HackerNewsAPI {
      */
     public List<String> getUserStories(String username) {
 
-        List<String> userStoryUrls = new ArrayList<String>(); // List of Strings containing the urls of the stories of the user
+        List<String> userStoryUrls = new ArrayList<String>(); // List of Strings containing the urls of the stories of
+                                                              // the user
         System.out.println("Getting @" + username + " top stories...");
 
         try {
-            URL url = new URL("https://hacker-news.firebaseio.com/v0/user/" + username + ".json?print=pretty"); // URL that returns the stories of the user
+            URL url = new URL("https://hacker-news.firebaseio.com/v0/user/" + username + ".json?print=pretty"); // URL
+                                                                                                                // that
+                                                                                                                // returns
+                                                                                                                // the
+                                                                                                                // stories
+                                                                                                                // of
+                                                                                                                // the
+                                                                                                                // user
 
             // Open the connection
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -123,7 +132,7 @@ public class HackerNewsAPI {
                     contentList[contentList.length - 1].length() - 1);
 
             // Parse the JSON response
-            userStoryUrls = jsonParser(contentList);
+            userStoryUrls = jsonParser(contentList, true);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,7 +152,7 @@ public class HackerNewsAPI {
      * @return List of Strings containing the urls of the stories
      * @throws InterruptedException
      */
-    private List<String> jsonParser(String[] contentList) throws InterruptedException {
+    private List<String> jsonParser(String[] contentList, boolean user) throws InterruptedException {
 
         List<String> urlList = new ArrayList<String>(); // List of Strings containing the urls of the stories
         List<Thread> threads = new ArrayList<Thread>(); // List of Threads
@@ -151,12 +160,24 @@ public class HackerNewsAPI {
 
         List<String> invalidURLS = new ArrayList<String>(); // List of Strings containing stories with invalid URLs
 
-        for (int i = 0; i < contentList.length; i++) {
+        int numStories;
+        if (user) {
+            numStories = contentList.length; // Number of stories to get
+        } else {
+            numStories = 10; // Number of stories to get
+        }
+
+        for (int i = 0; i < numStories; i++) {
             final int index = i;
 
             Thread t = new Thread(() -> {
                 try {
-                    URL story = new URL("https://hacker-news.firebaseio.com/v0/item/" + contentList[index] + ".json?print=pretty"); // URL that returns the story
+                    URL story = new URL(
+                            "https://hacker-news.firebaseio.com/v0/item/" + contentList[index] + ".json?print=pretty"); // URL
+                                                                                                                        // that
+                                                                                                                        // returns
+                                                                                                                        // the
+                                                                                                                        // story
 
                     // Open the connection
                     HttpURLConnection storyCon = (HttpURLConnection) story.openConnection();

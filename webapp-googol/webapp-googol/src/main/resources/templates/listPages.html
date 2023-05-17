@@ -24,22 +24,22 @@
         }
 
         h1 {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-weight: bold;
             color: #fff;
-            font-size: 40px;
-            margin: 0;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
 
         .form-container {
-            background-color: rgba(255, 255, 255, 0.2);
+            /* background-color: rgba(255, 255, 255, 0.2);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
             max-width: 500px;
             width: 80%;
+            overflow: hidden; */
+            max-height: 400px;
+            overflow-y: auto;
+            /* Adicionado para a barra de rolagem */
         }
 
         h2 {
@@ -115,7 +115,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
     </style>
 
     <title>Search Engine</title>
@@ -132,15 +131,17 @@
         </div>
     </h1>
 
-    <div class="form-container">
-        <h2>List a Page</h2>
+    <div class="form-container" style="overflow: auto; max-height: 600px;">
+        <h2 style="text-align: center">List a Page</h2>
         <form>
             <div class="form-group">
                 <input type="text" name="url" required>
             </div>
             <button type="submit">List</button>
         </form>
-        <p th:if="${results != null}" th:text="${results}"></p>
+        <div style="color:#fff; font-size: 16px; line-height: 1.4; text-align: center; padding: 20px;"
+            th:if="${hasInfo}" th:utext="${results} ?: 'No results found'">
+        </div>
     </div>
 </body>
 

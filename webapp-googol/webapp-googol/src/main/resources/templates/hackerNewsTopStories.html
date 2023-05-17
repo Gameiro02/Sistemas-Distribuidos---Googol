@@ -2,13 +2,12 @@
 <html lang="en">
 
 <head>
-    <title>Search Engine</title>
+    <title>Index of Hacker News's Top Stories</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
         /* Estilos CSS */
-
         html,
         body {
             font-family: raleway, sans-serif;
@@ -89,6 +88,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            size: 100px;
         }
 
         .letter {
@@ -105,41 +105,31 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .letterStatic {
-            transition: 0.4s;
-            transform: translateX(0);
-            cursor: grab;
-            color: #fff;
-        }
-
-        .letterStatic:hover {
-            background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
-            background-clip: border-box;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
     </style>
 </head>
 
 <body>
     <h1>
         <div class="animated-word">
-            <a href="/" style="text-decoration: none;">
-                <div class="letterStatic" style="position: absolute; top: 10px; left: 10px;">G</div>
-            </a>
+            <div class="letter">G</div>
+            <div class="letter">o</div>
+            <div class="letter">o</div>
+            <div class="letter">g</div>
+            <div class="letter">o</div>
+            <div class="letter">l</div>
         </div>
     </h1>
     <div class="form-container">
-        <h2>Index a URL</h2>
+        <h2>Index Hackers By Username</h2>
         <form>
             <div class="form-group">
-                <input type="text" name="url" required>
+                <input type="text" placeholder="Username" name="username" required>
             </div>
             <button type="submit">Index</button>
         </form>
-        <p th:if="${results != null}" th:text="${results}"></p>
+        <p th:text="'Results for query: ' + ${results}"></p>
     </div>
+
 </body>
 
 </html>
