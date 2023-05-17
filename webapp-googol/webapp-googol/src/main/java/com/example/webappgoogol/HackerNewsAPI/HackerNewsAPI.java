@@ -41,10 +41,11 @@ public class HackerNewsAPI {
             StringBuffer response = new StringBuffer();
 
             // Read the response from the API
-            while ((inputLine = in.readLine()) != null) {
+            for (int i = 0; i < 10; i++) {
+                inputLine = in.readLine();
                 response.append(inputLine);
             }
-
+            
             // Close the connection
             in.close();
             connection.disconnect();
@@ -151,7 +152,7 @@ public class HackerNewsAPI {
 
         List<String> invalidURLS = new ArrayList<String>(); // List of Strings containing stories with invalid URLs
 
-        for (int i = 0; i < contentList.length; i++) {
+        for (int i = 0; i < 10; i++) {
             final int index = i;
 
             Thread t = new Thread(() -> {

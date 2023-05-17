@@ -184,7 +184,7 @@ public class GoogolController {
         }
 
         model.addAttribute("hackerNewsResult", "Top stories from Hacker News indexed with success!");
-        return "/";
+        return "menu";
     }
 
     @MessageMapping("/hello")
