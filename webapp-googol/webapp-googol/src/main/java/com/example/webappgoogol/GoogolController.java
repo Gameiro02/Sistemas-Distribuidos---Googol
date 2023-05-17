@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -38,6 +41,8 @@ public class GoogolController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Autowired
     public GoogolController(SearchModuleInterface searchModule) {
@@ -189,15 +194,25 @@ public class GoogolController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/admin")
-    public Mensagem greeting() throws Exception {
-        Thread.sleep(1000); // simulated delay
+    public void greeting() throws Exception {
+        scheduler.scheduleAtFixedRate(this::sendMessage, 0, 1, TimeUnit.SECONDS);
+    }
 
-        String s = convertToJSON(searchModule.getStringMenu());
+    private void sendMessage() {
+        try {
+            String s = convertToJSON(searchModule.getStringMenu());
 
-        printJSON(s);
-        System.out.println("aa");
+            printJSON(s);
+            System.out.println("aa");
 
-        return new Mensagem(s);
+            Mensagem mensagem = new Mensagem(s);
+            // Enviar a mensagem para o tópico "/topic/admin" usando SimpMessagingTemplate
+            // ou similar
+
+            messagingTemplate.convertAndSend("/topic/admin", mensagem);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @GetMapping("/")
