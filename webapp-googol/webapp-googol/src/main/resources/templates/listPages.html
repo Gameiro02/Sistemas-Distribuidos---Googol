@@ -3,7 +3,105 @@
 
 <head>
     <style>
-        
+        /* Estilos CSS */
+
+        html,
+        body {
+            font-family: raleway, sans-serif;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            background-color: #1a1e23;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        h1 {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 40px;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            width: 80%;
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 24px;
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        button {
+            display: block;
+            width: 80%;
+            margin: 0 auto;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #1a1e23;
+        }
+
+        button {
+            background-color: #fff;
+            color: #1a1e23;
+            font-weight: bold;
+            cursor: pointer;
+            width: 40%;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        p {
+            color: #fff;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .animated-word {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .letter {
+            transition: 0.4s;
+            transform: translateX(0);
+            cursor: grab;
+            color: #fff;
+        }
+
+        .letter:hover {
+            transform: translateY(-1rem);
+            background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
+            background-clip: border-box;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .letterStatic {
             transition: 0.4s;
             transform: translateX(0);
@@ -23,18 +121,27 @@
     <title>Search Engine</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="\SearchEngine.css">
 </head>
 
 <body>
-    <h1>List Pages</h1>
-    <form action="/listPages" method="get">
-        <label for="page-input">Url:</label>
-        <input type="text" id="page-input" name="url" required>
-        <button type="submit">List</button>
+    <h1>
+        <div class="animated-word">
+            <a href="/" style="text-decoration: none;">
+                <div class="letterStatic" style="position: absolute; top: 10px; left: 10px;">G</div>
+            </a>
+        </div>
+    </h1>
 
-        <p th:text="'Results for query: ' + ${results}"></p>
-    </form>
+    <div class="form-container">
+        <h2>List a Page</h2>
+        <form>
+            <div class="form-group">
+                <input type="text" name="url" required>
+            </div>
+            <button type="submit">List</button>
+        </form>
+        <p th:if="${results != null}" th:text="${results}"></p>
+    </div>
 </body>
 
 </html>

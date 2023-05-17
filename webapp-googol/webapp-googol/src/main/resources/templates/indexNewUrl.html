@@ -132,14 +132,14 @@
         </div>
     </h1>
     <div class="form-container">
-        <h2>Index Url</h2>
+        <h2>Index a URL</h2>
         <form>
             <div class="form-group">
-                <input type="text" placeholder="NewUrl" name="url" required>
-    </div>
-        <button type="submit">Search</button>
+                <input type="text" name="url" required>
+        </div>
+        <button type="submit">Index</button>
         </form>
-        <p th:text="'Results for query: ' + ${results}"></p>
+        <p th:if="${results != null}" th:text="${results}"></p>
     </div>
 </body>
 </html>
