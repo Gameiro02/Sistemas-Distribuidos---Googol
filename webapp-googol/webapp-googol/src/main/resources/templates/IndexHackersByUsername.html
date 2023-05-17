@@ -91,6 +91,20 @@
             size: 100px;
         }
 
+        .letterStatic {
+            transition: 0.4s;
+            transform: translateX(0);
+            cursor: grab;
+            color: #fff;
+        }
+
+        .letterStatic:hover {
+            background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
+            background-clip: border-box;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .letter {
             transition: 0.4s;
             transform: translateX(0);
@@ -99,7 +113,6 @@
         }
 
         .letter:hover {
-            transform: translateY(-1rem);
             background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
             background-clip: border-box;
             -webkit-background-clip: text;
@@ -111,12 +124,9 @@
 <body>
     <h1>
         <div class="animated-word">
-            <div class="letter">G</div>
-            <div class="letter">o</div>
-            <div class="letter">o</div>
-            <div class="letter">g</div>
-            <div class="letter">o</div>
-            <div class="letter">l</div>
+            <a href="/">
+                <div class="letterStatic" style="position: absolute; top: 10px; left: 10px;">G</div>
+            </a>
         </div>
     </h1>
     <div class="form-container">
@@ -126,9 +136,11 @@
                 <input type="text" placeholder="Username" name="username" required>
             </div>
             <button type="submit">Index</button>
-         </form>
-         <p th:text="'Results for query: ' + ${results}"></p>
-    </div>
+        </form>
+        <div th:unless=${justClicked}>
+            <p th:if=${results} th:text="'The stories of @' + ${hacker} +' have been indexed'"></p>
+            <p th:unless=${results} th:text="'The user @' + ${hacker} + ' does not exist'"></p>
+        </div>
 
 </body>
 

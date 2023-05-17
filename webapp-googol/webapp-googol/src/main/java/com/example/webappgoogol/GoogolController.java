@@ -50,15 +50,6 @@ public class GoogolController {
         this.hackerNewsAPI = new HackerNewsAPI();
     }
 
-    @GetMapping("/greeting")
-    public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String name,
-            @RequestParam(name = "othername", required = false, defaultValue = "Gameiro") String othername,
-            Model model) {
-        model.addAttribute("name", name);
-        model.addAttribute("othername", othername);
-        return "greeting";
-    }
-
     // When the button is pressed, the form is submitted and we print the result in
     // the ${query} variable
     @GetMapping("/search")
@@ -109,11 +100,38 @@ public class GoogolController {
             return "redirect:/login";
         }
 
+        model.addAttribute("hasInfo", false);
+
+        if (url.equals("")) {
+            return "listPages";
+        }
+
         System.out.println("url to list = " + url);
 
         try {
             List<String> results = searchModule.linksToAPage(url);
-            model.addAttribute("results", results);
+
+            String resultsString = "";
+            resultsString = results.toString();
+
+            // Replace the first character "[" with "\""
+            resultsString = resultsString.replaceFirst("\\[", "");
+            // Replace the last character "]" with "\""
+            resultsString = resultsString.substring(0, resultsString.length() - 1);
+
+            resultsString = resultsString.replace(", ", "<br>");
+
+            System.out.println("resultsString = " + resultsString);
+
+            model.addAttribute("hasInfo", true);
+
+            if (results == null || results.isEmpty()) {
+                model.addAttribute("hasResults", false);
+                return "listPages";
+            }
+
+            model.addAttribute("hasResults", true);
+            model.addAttribute("results", resultsString);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
         }
@@ -126,16 +144,21 @@ public class GoogolController {
             @RequestParam(name = "username", required = false, defaultValue = "") String username, Model model) {
         List<String> results = new ArrayList<String>();
 
+        model.addAttribute("justClicked", true);
+
+        if (username == null || username.equals("")) {
+            return "IndexHackersByUsername";
+        }
+
         try {
             results = hackerNewsAPI.getUserStories(username);
 
-            if (results.size() == 0) {
-                model.addAttribute("results", "O utilizador não existe ou não tem histórias!");
+            if (results == null || results.isEmpty()) {
+                model.addAttribute("results", false);
+                model.addAttribute("justClicked", false);
+                model.addAttribute("hacker", username);
                 return "IndexHackersByUsername";
             }
-
-            model.addAttribute("results", results);
-            System.out.println("results = " + results);
 
             for (String url : results) {
                 boolean searching = true;
@@ -149,6 +172,11 @@ public class GoogolController {
                 }
                 searchModule.IndexarUmNovoUrl(url);
             }
+
+            model.addAttribute("justClicked", false);
+            model.addAttribute("results", true);
+            model.addAttribute("hacker", username);
+            System.out.println("results = " + results);
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -188,8 +216,11 @@ public class GoogolController {
             return "error";
         }
 
+        model.addAttribute("hackerNewsBoolean", true);
         model.addAttribute("hackerNewsResult", "Top stories from Hacker News indexed with success!");
-        return "/";
+        model.addAttribute("username", this.username);
+        model.addAttribute("userLogged", this.userLogged);
+        return "menu";
     }
 
     @MessageMapping("/hello")
@@ -202,8 +233,8 @@ public class GoogolController {
         try {
             String s = convertToJSON(searchModule.getStringMenu());
 
-            printJSON(s);
-            System.out.println("aa");
+            // printJSON(s);
+            // System.out.println("aa");
 
             Mensagem mensagem = new Mensagem(s);
             // Enviar a mensagem para o tópico "/topic/admin" usando SimpMessagingTemplate
@@ -405,25 +436,6 @@ public class GoogolController {
         }
 
         return null;
-    }
-
-    @GetMapping("/results")
-    public String results(@RequestParam(name = "query", required = false, defaultValue = "") String query,
-            Model model) {
-
-        if (query.equals("")) {
-            return "search";
-        }
-
-        try {
-            List<String> results = searchModule.searchForWords(query);
-            model.addAttribute("results", results);
-        } catch (Exception e) {
-            System.out.println("Erro ao conectar com o servidor!!!!!!!");
-            e.printStackTrace();
-        }
-
-        return "results";
     }
 
     @GetMapping("getSearchResults/{query}")
