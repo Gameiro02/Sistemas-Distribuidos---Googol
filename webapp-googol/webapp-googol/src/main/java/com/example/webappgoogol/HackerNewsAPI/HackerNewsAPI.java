@@ -42,7 +42,8 @@ public class HackerNewsAPI {
             StringBuffer response = new StringBuffer();
 
             // Read the response from the API
-            while ((inputLine = in.readLine()) != null) {
+            for (int i = 0; i < 10; i++) {
+                inputLine = in.readLine();
                 response.append(inputLine);
             }
 
