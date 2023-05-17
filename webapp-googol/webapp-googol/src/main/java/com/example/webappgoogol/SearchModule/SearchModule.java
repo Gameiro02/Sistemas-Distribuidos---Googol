@@ -219,7 +219,7 @@ public class SearchModule extends UnicastRemoteObject implements SearchModuleInt
         // registry.rebind("SearchModule", searchModule);
 
         SearchModule searchModule = new SearchModule();
-        LocateRegistry.createRegistry(1099);
+        LocateRegistry.createRegistry(Configuration.RMI_PORT_SEARCH_MODULE);
         Naming.rebind("SearchModule", searchModule);
 
         for (int i = 1; i <= Configuration.NUM_BARRELS; i++) {

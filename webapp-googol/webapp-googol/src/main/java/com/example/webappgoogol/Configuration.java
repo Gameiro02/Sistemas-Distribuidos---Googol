@@ -23,4 +23,7 @@ public class Configuration {
     public static final int MAXIMUM_REFERENCE_LINKS = 10;
 
     public static final int PAGE_SIZE = 10;
+
+    public static final String RMI_ADDRESS_SEARCH_MODULE = "192.168.1.82";
+    public static final int RMI_PORT_SEARCH_MODULE = 1099;
 }
