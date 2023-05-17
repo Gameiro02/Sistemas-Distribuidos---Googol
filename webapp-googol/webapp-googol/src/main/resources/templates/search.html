@@ -132,6 +132,20 @@
             color: #fff;
         }
 
+        .letterStatic {
+            transition: 0.4s;
+            transform: translateX(0);
+            cursor: grab;
+            color: #fff;
+        }
+
+        .letterStatic:hover {
+            background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
+            background-clip: border-box;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .letter:hover {
             transform: translatey(-1rem);
             background: -webkit-linear-gradient(120deg, hsl(19, 90%, 52%), hsl(56, 100%, 50%));
@@ -145,6 +159,9 @@
 <body>
     <h1>
         <div class="animated-word">
+            <a href="/" style="text-decoration: none;">
+                <div class="letterStatic" style="position: absolute; top: 10px; left: 10px;">G</div>
+            </a>
             <div class="letter">G</div>
             <div class="letter">o</div>
             <div class="letter">o</div>
@@ -164,7 +181,7 @@
         document.querySelector('.src-box input[type=text]').addEventListener('keyup', function (e) {
             if (e.keyCode == 13) {
                 result = document.querySelector('.src-box input[type=text]').value
-                window.location.href = 'http://localhost:8080/getSearchResults/' + result;
+                window.location.href = 'http://localhost:8080/getSearchResults/' + result + "?page=0";
             }
         });
     </script>

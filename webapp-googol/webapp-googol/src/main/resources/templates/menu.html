@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MENU</title>
+  <title>Home Page</title>
 
   <style>
     * {
@@ -98,6 +98,17 @@
       margin-right: 30px;
     }
 
+    .username {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 30px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin-left: 30px;
+    }
+
     .login-button,
     .register-button {
       color: #FFF;
@@ -137,12 +148,17 @@
       <li><a href="/IndexHackersNews">Index Hackers News</a></li>
       <li><a href="/IndexHackersByUsername">Index Hackers By Username</a></li>
     </ul>
+
+    <p th:text="${hackerNewsResult}">Boas pessoal</p>
+
   </nav>
   <div class="LogReg">
-    <a href="/login" class="login-button">Login</a>
-    <a href="/register" class="register-button">Register</a>
-    <a href="/menu" class="register-button">Logout</a>
+    <a th:unless="${userLogged}" href="/login" class="login-button">Login</a>
+    <a th:unless="${userLogged}" href="/register" class="register-button">Register</a>
+    <span th:if="${userLogged}" style="font-size: 14px; color: #FFF; margin-right: 10px;">Logged in as <span th:text="${username}"></span></span>
+    <a th:if="${userLogged}" href="/logout" class="register-button">Logout</a>
   </div>
+
   
 </body>
 

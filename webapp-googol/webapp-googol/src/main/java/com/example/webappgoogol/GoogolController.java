@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -37,6 +34,7 @@ public class GoogolController {
     private HackerNewsAPI hackerNewsAPI;
 
     private boolean userLogged = false;
+    private String username;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -76,7 +74,7 @@ public class GoogolController {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
         }
 
-        return "redirect:/getSearchResults/" + query;
+        return "redirect:/getSearchResults/" + query + "?page=0";
     }
 
     @GetMapping("/indexNewUrl")
@@ -90,7 +88,7 @@ public class GoogolController {
 
         try {
             searchModule.IndexarUmNovoUrl(url);
-            String message = "Url indexada com sucesso!";
+            String message = "URL indexado com sucesso!";
             model.addAttribute("results", message);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
@@ -103,14 +101,13 @@ public class GoogolController {
     public String listPages(@RequestParam(name = "url", required = false, defaultValue = "") String url, Model model) {
 
         if (!this.userLogged) {
-            return "login";
+            return "redirect:/login";
         }
 
         System.out.println("url to list = " + url);
 
         try {
             List<String> results = searchModule.linksToAPage(url);
-            System.out.println("results = " + results);
             model.addAttribute("results", results);
         } catch (Exception e) {
             System.out.println("Erro ao conectar com o servidor!!!!!!!");
@@ -159,14 +156,14 @@ public class GoogolController {
     public String IndexHackersNews(Model model) {
         List<String> results = new ArrayList<String>();
 
-        model.addAttribute("results", "A indexar os top stories do Hacker News");
+        model.addAttribute("hackerNewsResult", "Indexing Hacker News top stories...");
 
         try {
             results = hackerNewsAPI.getTopStories();
 
             if (results.isEmpty() || results == null) {
-                model.addAttribute("results", "Erro a ir buscar os top stories: A lista vem vazia ou esta null");
-                return "search";
+                model.addAttribute("hackerNewsResult", "Error getting top stories from Hacker News!");
+                return "/";
             }
 
             for (String url : results) {
@@ -182,12 +179,12 @@ public class GoogolController {
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
-            model.addAttribute("results", "Ocorreu um erro ao indexar os top stories do Hacker News");
+            model.addAttribute("hackerNewsResult", "Ocorreu um erro ao indexar os top stories do Hacker News");
             return "error";
         }
 
-        model.addAttribute("results", "Top stories do Hacker News indexados com sucesso!");
-        return "search";
+        model.addAttribute("hackerNewsResult", "Top stories from Hacker News indexed with success!");
+        return "/";
     }
 
     @MessageMapping("/hello")
@@ -204,7 +201,9 @@ public class GoogolController {
     }
 
     @GetMapping("/")
-    public String root() {
+    public String root(Model model) {
+        model.addAttribute("userLogged", this.userLogged);
+        model.addAttribute("username", this.username);
         return "menu";
     }
 
@@ -262,6 +261,12 @@ public class GoogolController {
         return "seila";
     }
 
+    @GetMapping("/logout")
+    public String logout() {
+        this.userLogged = false;
+        return "redirect:/";
+    }
+
     @GetMapping("/login")
     public String processLogin(Model model) {
 
@@ -293,8 +298,9 @@ public class GoogolController {
 
                 if (parts[0].equals(username) && parts[1].equals(password)) {
                     System.out.println("Login successful!");
-                    userLogged = true;
-                    return "redirect:/search";
+                    this.userLogged = true;
+                    this.username = username;
+                    return "redirect:/";
                 }
             }
             scanner.close();
@@ -303,12 +309,6 @@ public class GoogolController {
         }
 
         System.out.println("Login failed!");
-        return "redirect:/login";
-    }
-
-    @GetMapping("/logout")
-    public String logout() {
-        this.userLogged = false;
         return "redirect:/login";
     }
 
