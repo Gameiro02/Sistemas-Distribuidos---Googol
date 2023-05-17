@@ -57,6 +57,17 @@
         padding: 20px;
       }
 
+      .button-container {
+        display: flex;
+        justify-content: center;
+      }
+
+      button {
+        border-radius: 5px;
+        width: 150px;
+        margin-right: 10px;
+      }
+
       .result-title {
         color: hsl(19, 90%, 52%);
         font-weight: bold;
@@ -98,8 +109,10 @@
   </head>
 
   <body>
-    <button onclick="decrementPagina()">Previous</button>
-    <button onclick="incrementPagina()">Next</button>
+    <div th:unless="${noResults}" class="button-container">
+      <button onclick="decrementPagina()">Previous</button>
+      <button onclick="incrementPagina()">Next</button>
+    </div>
 
     <script>
       function incrementPagina() {

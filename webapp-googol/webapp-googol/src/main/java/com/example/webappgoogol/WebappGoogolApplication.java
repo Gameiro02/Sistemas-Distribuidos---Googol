@@ -26,7 +26,7 @@ public class WebappGoogolApplication {
 			// Naming.lookup("rmi://localhost/SearchModule");
 
 			/* RMI PC LOBO */
-			Registry registry = LocateRegistry.getRegistry("10.16.0.232", 1099);
+			Registry registry = LocateRegistry.getRegistry("192.168.1.82", 1099);
 			searchModule = (SearchModuleInterface) registry.lookup("SearchModule");
 		} catch (Exception e) {
 			System.out.println("Erro ao conectar com o servidor, tentando novamente em 3 segundos");

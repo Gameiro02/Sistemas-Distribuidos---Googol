@@ -448,6 +448,7 @@ public class GoogolController {
         messagingTemplate.convertAndSend("/topic/admin", new Mensagem(convertToJSON(searchModule.getStringMenu())));
 
         if (aux.size() == 0) {
+            model.addAttribute("noResults", true);
             model.addAttribute("results", "Nenhum resultado encontrado!");
             return "getSearchResults";
         }
