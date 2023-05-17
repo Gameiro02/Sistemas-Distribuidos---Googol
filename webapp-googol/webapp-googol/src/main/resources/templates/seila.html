@@ -7,27 +7,130 @@
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script src="/app.js"></script>
+    <script>
+        var greetingsCell = null; // Referência à célula da tabela onde as saudações serão exibidas
+
+        function showGreeting(message) {
+            if (!greetingsCell) {
+                // Se a célula ainda não existe, crie-a
+                greetingsCell = document.createElement('td');
+                var greetingsRow = document.createElement('tr');
+                greetingsRow.appendChild(greetingsCell);
+                document.getElementById('greetings').appendChild(greetingsRow);
+            }
+
+            // Remover as tags <pre>{ e }</pre> do início e fim da mensagem
+            var trimmedMessage = message.replace(/^<pre>{\s*|\s*}<\/pre>$/g, '');
+
+            // Remover as aspas duplas ("") da mensagem
+            var cleanedMessage = trimmedMessage.replace(/"/g, '');
+
+            // Dividir as strings por vírgulas
+            var strings = cleanedMessage.split(',');
+
+            // Criar uma lista para as saudações
+            var messageList = document.createElement('ul');
+            messageList.classList.add('message-list');
+
+            // Limpar o conteúdo anterior da lista
+            messageList.innerHTML = '';
+
+            // Adicionar cada saudação à lista
+            strings.forEach(function (str) {
+                var trimmedStr = str.trim();
+                if (trimmedStr !== '') {
+                    var listItem = document.createElement('li');
+                    var colonIndex = trimmedStr.indexOf(':');
+                    var label = trimmedStr.substring(0, colonIndex + 1);
+                    var value = trimmedStr.substring(colonIndex + 1);
+                    var labelSpan = document.createElement('span');
+                    if (label.includes('_')) {
+                        labelSpan.style.color = 'hsl(19, 70%, 42%)';
+                    }
+                    labelSpan.textContent = label;
+                    var valueSpan = document.createElement('span');
+                    valueSpan.textContent = value;
+                    listItem.appendChild(labelSpan);
+                    listItem.appendChild(valueSpan);
+                    messageList.appendChild(listItem);
+                }
+            });
+
+            // Limpar o conteúdo anterior da célula
+            greetingsCell.innerHTML = '';
+
+            // Adicionar a lista à célula
+            greetingsCell.appendChild(messageList);
+        }
+    </script>
+
+
+    <style>
+        body {
+            background-color: #1a1e23;
+            color: white;
+            text-align: center;
+        }
+
+        table {
+            margin: 0 auto;
+            width: 50%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .message-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+            max-height: 200px;
+            overflow: auto;
+            overflow-x: hidden;
+        }
+
+        .message-list li {
+            white-space: nowrap;
+        }
+
+        .message-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .message-wrapper {
+            max-width: 100%;
+            max-height: 100%;
+            overflow: auto;
+            overflow-x: hidden;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 
 <body>
     <div id="main-content" class="container">
         <div class="row">
-            <div class="col-md-6">
-                <!-- <form class="form-inline">
-                    <div class="form-group">
-                        <label for="connect">WebSocket connection:</label>
-                        <button id="connect" class="btn btn-default" type="submit">Connect</button>
-                        <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
-                        </button>
-                    </div>
-                </form> -->
-            </div>
+            <div class="col-md-6"></div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <table id="conversation" class="table table-striped">
-                    <tbody id="greetings">
-                    </tbody>
+                    <tbody id="greetings"></tbody>
                 </table>
             </div>
         </div>
